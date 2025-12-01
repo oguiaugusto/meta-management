@@ -17,7 +17,12 @@ const Login: React.FC = () => {
           />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="password">Password</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">Password</Label>
+            <a href="/recover" className="text-xs mt-[3.5px] underline-offset-4 hover:underline">
+              Forgot your password?
+            </a>
+          </div>
           <Input
             id="password"
             type="password"
