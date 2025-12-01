@@ -1,8 +1,14 @@
 import React from 'react';
+import { Route, BrowserRouter as Router, Routes } from 'react-router';
+import { Login } from './modules/User/pages/Login';
 
 const App: React.FC = () => {
   return (
-    <h1>Hello, World!</h1>
+    <Router>
+      <Routes>
+        <Route path="/" element={ <Login /> } />
+      </Routes>
+    </Router>
   );
 };
 
