@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/icon.svg';
 
 type Props = {
   title: string;
@@ -12,8 +12,8 @@ const AccountFormCard: React.FC<Props> = (p) => {
   return (
   <Card className="w-100 max-w-xs mt-20">
     <CardHeader>
-      <CardTitle className="text-center flex flex-col items-center gap-3">
-        <img src={ logo } alt="Meta Management logo" className="w-35 mb-2" />
+      <CardTitle className="text-center flex flex-col items-center gap-1">
+        <img src={ logo } alt="Meta Management logo" className="w-10" />
         <span className="text-lg">{ p.title }</span>
       </CardTitle>
     </CardHeader>
