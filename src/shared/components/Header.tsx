@@ -23,14 +23,14 @@ const Header: React.FC = () => {
   ];
 
   return (
-    <header className="w-full h-15 flex flex-col justify-between items-center">
+    <header className="w-full h-15 flex flex-col justify-between items-center bg-zinc-200">
       <div className="h-full flex justify-between items-center w-full px-10">
         <img src={ logo } alt="Meta Management logo" className="w-42" />
         <nav>
           <ul className="grid grid-cols-4">
             {
               navButtons.map((x) => (
-                <li key={ `nav-${x.label}` }>
+                <li key={ `nav-${x.label}` } className="mx-auto">
                   <Button variant="link" className="text-zinc-800 focus-visible:shadow-none">
                     { x.label }
                   </Button>
