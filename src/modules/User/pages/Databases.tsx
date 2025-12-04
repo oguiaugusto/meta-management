@@ -1,9 +1,9 @@
 import React from 'react';
 import { Atom, Book, Car, Globe, House, Music2, Plus, ShoppingCart } from 'lucide-react';
-import { Header } from '@/shared/components/Header';
 import { ItemCard } from '@/shared/components/ItemCard';
 import { ZINC_700 } from '@/shared/constants';
 import { PageCard } from '@/shared/components/PageCard';
+import { PageWrapper } from '@/shared/components/PageWrapper';
 
 const iconProps = {
   size: 50,
@@ -24,8 +24,7 @@ const data = [
 
 const Databases: React.FC = () => {
   return (
-    <div className="w-full flex flex-col items-center mb-10">
-      <Header />
+    <PageWrapper>
       <PageCard title="Databases">
         <div className="grid grid-cols-5 gap-3">
           <ItemCard
@@ -41,7 +40,7 @@ const Databases: React.FC = () => {
           }
         </div>
       </PageCard>
-    </div>
+    </PageWrapper>
   );
 };
 
