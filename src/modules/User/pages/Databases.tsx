@@ -37,7 +37,7 @@ const Databases: React.FC = () => {
           <CardTitle className="text-center text-xl">Databases</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-5 gap-3 mt-5">
+          <div className="grid grid-cols-5 gap-3">
             <ItemCard
               name="New Database"
               link="/databases/new"
