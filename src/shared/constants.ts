@@ -1,0 +1,1 @@
+export const ZINC_700 = 'oklch(37% 0.013 285.805)';
