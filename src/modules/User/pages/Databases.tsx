@@ -19,13 +19,13 @@ const iconProps = {
 /* Temporary data
  */
 const data = [
-  { name: 'Book Store', link: '#', icon: <Book { ...iconProps } /> },
-  { name: 'Social Media', link: '#', icon: <Globe { ...iconProps } /> },
-  { name: 'House', link: '#', icon: <House { ...iconProps } /> },
-  { name: 'Supermarket', link: '#', icon: <ShoppingCart { ...iconProps } /> },
-  { name: 'Music', link: '#', icon: <Music2 { ...iconProps } /> },
-  { name: 'Science Data', link: '#', icon: <Atom { ...iconProps } /> },
-  { name: 'Car', link: '#', icon: <Car { ...iconProps } /> },
+  { name: 'Book Store', link: '/databases/1', icon: <Book { ...iconProps } /> },
+  { name: 'Social Media', link: '/databases/2', icon: <Globe { ...iconProps } /> },
+  { name: 'House', link: '/databases/3', icon: <House { ...iconProps } /> },
+  { name: 'Supermarket', link: '/databases/4', icon: <ShoppingCart { ...iconProps } /> },
+  { name: 'Music', link: '/databases/5', icon: <Music2 { ...iconProps } /> },
+  { name: 'Science Data', link: '/databases/6', icon: <Atom { ...iconProps } /> },
+  { name: 'Car', link: '/databases/7', icon: <Car { ...iconProps } /> },
 ];
 
 const Databases: React.FC = () => {
