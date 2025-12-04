@@ -35,7 +35,7 @@ const Login: React.FC = () => {
 
   const renderCardFooter = () => (
     <React.Fragment>
-    <Button type="submit" variant="default" className="w-full">
+      <Button type="submit" variant="default" className="w-full">
         Sign in
       </Button>
       <p className="text-xs font-medium">
