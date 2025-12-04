@@ -10,26 +10,33 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import logo from '../../assets/logo.svg';
+import { useNavigate } from 'react-router';
 
 const Header: React.FC = () => {
+  const navigate = useNavigate();
+
   const navButtons = [
     {
       label: 'Home',
-      link: '#',
+      link: '/',
     },
     {
-      label: 'Tables',
-      link: '#',
+      label: 'Databases',
+      link: '/databases',
     },
     {
       label: 'Docs',
-      link: '#',
+      link: '/docs',
     },
     {
       label: 'Contact',
-      link: '#',
+      link: '/contact',
     },
   ];
+
+  const handleNavigate = (link: string) => {
+    navigate(link)
+  };
 
   const iconColor = 'oklch(27.4% 0.006 286.033)';
 
@@ -42,7 +49,11 @@ const Header: React.FC = () => {
             {
               navButtons.map((x) => (
                 <li key={ `nav-${x.label}` } className="mx-auto">
-                  <Button variant="link" className="text-zinc-800 focus-visible:shadow-none">
+                  <Button
+                    variant="link"
+                    className="text-zinc-800 focus-visible:shadow-none"
+                    onClick={ () => handleNavigate(x.link) }
+                  >
                     { x.label }
                   </Button>
                 </li>
