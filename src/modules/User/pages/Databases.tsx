@@ -1,14 +1,9 @@
 import React from 'react';
 import { Atom, Book, Car, Globe, House, Music2, Plus, ShoppingCart } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Header } from '@/shared/components/Header';
 import { ItemCard } from '@/shared/components/ItemCard';
 import { ZINC_700 } from '@/shared/constants';
+import { PageCard } from '@/shared/components/PageCard';
 
 const iconProps = {
   size: 50,
@@ -16,8 +11,7 @@ const iconProps = {
   color: ZINC_700,
 };
 
-/* Temporary data
- */
+/* Temporary data */
 const data = [
   { name: 'Book Store', link: '/databases/1', icon: <Book { ...iconProps } /> },
   { name: 'Social Media', link: '/databases/2', icon: <Globe { ...iconProps } /> },
@@ -32,22 +26,21 @@ const Databases: React.FC = () => {
   return (
     <div className="w-full flex flex-col items-center mb-10">
       <Header />
-      <Card className="w-4xl mt-8 bg-zinc-50 pb-10">
-        <CardHeader>
-          <CardTitle className="text-center text-xl">Databases</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-5 gap-3">
-            <ItemCard
-              name="New Database"
-              link="/databases/new"
-              icon={ <Plus { ...iconProps } /> }
-              isNewItem
-            />
-            { data.map((x) => <ItemCard name={ x.name } link={ x.link } icon={ x.icon } />) }
-          </div>
-        </CardContent>
-      </Card>
+      <PageCard title="Databases">
+        <div className="grid grid-cols-5 gap-3">
+          <ItemCard
+            name="New Database"
+            link="/databases/new"
+            icon={ <Plus { ...iconProps } /> }
+            isNewItem
+          />
+          {
+            data.map((x, i) => (
+              <ItemCard key={ i } name={ x.name } link={ x.link } icon={ x.icon } />
+            ))
+          }
+        </div>
+      </PageCard>
     </div>
   );
 };
