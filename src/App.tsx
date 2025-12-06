@@ -4,6 +4,7 @@ import { Home } from './modules/User/pages/Home';
 import { Login } from './modules/User/pages/Login';
 import { Register } from './modules/User/pages/Register';
 import { Databases } from './modules/User/pages/Databases';
+import { Database } from './modules/User/pages/Database';
 
 const App: React.FC = () => {
   return (
@@ -13,6 +14,7 @@ const App: React.FC = () => {
         <Route path="/login" element={ <Login /> } />
         <Route path="/register" element={ <Register /> } />
         <Route path="/databases" element={ <Databases /> } />
+        <Route path="/databases/:id" element={ <Database /> } />
       </Routes>
     </Router>
   );
