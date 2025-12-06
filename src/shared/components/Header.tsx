@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import logo from '../../assets/logo.svg';
 import { useNavigate } from 'react-router';
+import { ZINC_700 } from '../constants';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
@@ -38,8 +39,6 @@ const Header: React.FC = () => {
     navigate(link)
   };
 
-  const iconColor = 'oklch(27.4% 0.006 286.033)';
-
   return (
     <header className="w-full h-15 flex flex-col justify-between items-center bg-zinc-200">
       <div className="h-full flex justify-between items-center w-full px-10">
@@ -51,7 +50,7 @@ const Header: React.FC = () => {
                 <li key={ `nav-${x.label}` } className="mx-auto">
                   <Button
                     variant="link"
-                    className="text-zinc-800 focus-visible:shadow-none"
+                    className="text-zinc-800"
                     onClick={ () => handleNavigate(x.link) }
                   >
                     { x.label }
@@ -63,21 +62,21 @@ const Header: React.FC = () => {
         </nav>
         <div className="w-[168px] flex items-center justify-end">
           <DropdownMenu>
-            <DropdownMenuTrigger className="cursor-pointer focus-visible:outline-none">
-              <UserRound size={ 30 } strokeWidth={ 1.5 } color={ iconColor } />
+            <DropdownMenuTrigger className="cursor-pointer" title="My account">
+              <UserRound size={ 30 } strokeWidth={ 1.5 } color={ ZINC_700 } />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-40 bg-zinc-50" align="end">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuItem>
                 <a href="/user" className="flex items-center gap-2 w-full">
-                  <Settings size={ 10 } strokeWidth={ 1.5 } color={ iconColor } />
+                  <Settings size={ 10 } strokeWidth={ 1.5 } color={ ZINC_700 } />
                   <span className="mb-[1px]">Settings</span>
                 </a>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <button className="m-0 p-0 border-none outline-none flex items-center gap-2 w-full cursor-pointer">
-                  <LogOut size={ 10 } strokeWidth={ 1.5 } color={ iconColor } />
+                  <LogOut size={ 10 } strokeWidth={ 1.5 } color={ ZINC_700 } />
                   <span className="mb-[1px]">Sign out</span>
                 </button>
               </DropdownMenuItem>
