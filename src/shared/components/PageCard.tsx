@@ -4,18 +4,27 @@ import React, { type PropsWithChildren } from 'react';
 type Props = PropsWithChildren & {
   title: string;
   description?: string;
+  rightNode?: React.ReactNode;
 };
 
 const PageCard: React.FC<Props> = (p) => {
   const renderCardHeader = () => {
+    let headerClass = '';
     let titleClass = 'text-xl ';
 
     let description: React.ReactNode | null = (
       <CardDescription className="mb-1">{ p.description }</CardDescription>
     );
 
+    let rightNode: React.ReactNode | null = null;
+
     if (p.description) {
       titleClass += 'text-left';
+
+      if (p.rightNode) {
+        rightNode = p.rightNode;
+        headerClass = 'flex items-center justify-between';
+      }
     } else {
       titleClass += 'text-center';
       description = null;
@@ -24,11 +33,12 @@ const PageCard: React.FC<Props> = (p) => {
     console.log(titleClass);
 
     return (
-      <CardHeader>
+      <CardHeader className={ headerClass }>
         <div>
           <CardTitle className={ titleClass }>{ p.title }</CardTitle>
           { description }
         </div>
+        { rightNode }
       </CardHeader>
     );
   };
