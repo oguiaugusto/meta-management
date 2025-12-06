@@ -1,10 +1,10 @@
 import React from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router';
-import { Home } from './modules/User/pages/Home';
+import { Home } from './modules/Home/pages/Home';
 import { Login } from './modules/User/pages/Login';
 import { Register } from './modules/User/pages/Register';
-import { Databases } from './modules/User/pages/Databases';
-import { Database } from './modules/User/pages/Database';
+import { Databases } from './modules/Database/pages/Databases';
+import { Database } from './modules/Database/pages/Database';
 
 const App: React.FC = () => {
   return (
