@@ -14,7 +14,7 @@ class Endpoints {
     skipAuth?: boolean
   ) {
     this.router[method](
-      '/api' + endpoint,
+      endpoint,
       // skipAuth ? (_req, _res, next) => next() : rescue(AuthMiddleware.handle),
       rescue(handler),
     );
