@@ -2,12 +2,28 @@ import { StatusCodes } from 'http-status-codes';
 import express from 'express';
 import cors from 'cors';
 import ErrorMiddleware from '../shared/middlewares/error';
+import Endpoints from '../shared/utils/Endpoint';
+import AuthController from '../modules/Auth/AuthController';
 import 'dotenv/config';
 
-class App {
-  public static app = express();
+type Deps = {
+  authController: AuthController;
+};
 
-  public static config(): void {
+class App {
+  public app = express();
+
+  private deps: Deps;
+
+  constructor(deps: typeof this.deps) {
+    this.deps = deps;
+
+    this.config();
+    this.routes();
+    this.app.use(ErrorMiddleware.handle);
+  }
+
+  private config(): void {
     const accessControl: express.RequestHandler = (_req, res, next) => {
       res.header('Access-Control-Allow-Origin', '*');
       res.header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS,PUT,PATCH');
@@ -18,20 +34,17 @@ class App {
     this.app.use(accessControl);
     this.app.use(cors());
     this.app.use(express.json({ limit: '6mb' }));
-
-    this.routes();
-    this.app.use(ErrorMiddleware.handle);
   }
 
-  private static routes(): void {
+  private routes(): void {
     this.app.get('/', (_, res) => {
       res.status(StatusCodes.OK).json({ message: 'Online! :)' })
     });
 
-    // this.app.use(Endpoints.router);
+    this.app.use(Endpoints.router);
   }
 
-  public static async start(PORT: string | number) {
+  public start(PORT: string | number) {
     const envVars = [
       'DB_HOST',
       'DB_PORT',
@@ -52,7 +65,9 @@ class App {
       throw new Error('Variáveis de ambiente não configuradas própriamente');
     }
 
-    this.app.listen(PORT, () => {
+    this.deps.authController.init();
+
+    return this.app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   }
