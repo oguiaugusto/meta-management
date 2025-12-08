@@ -8,3 +8,9 @@ export type UserDTO = {
 export type UserRepositoryDTO = Omit<UserDTO, 'password'> & {
   passwordHash: string;
 }
+
+export type RefreshTokenDTO = {
+  userId: string;
+  tokenHash: string;
+  expiresAt: string;
+};

@@ -1,5 +1,5 @@
 import { prisma } from '../../../database/prisma';
-import { UserRepositoryDTO } from './types';
+import { RefreshTokenDTO, UserRepositoryDTO } from './types';
 
 class AuthRepository {
   public async createUser (data: UserRepositoryDTO) {
@@ -12,6 +12,13 @@ class AuthRepository {
 
   public async findUserByEmail (email: string) {
     return prisma.user.findUnique({ where: { email } });
+  }
+
+  public async createRefreshToken (data: RefreshTokenDTO) {
+    await prisma.$transaction([
+      prisma.refreshToken.deleteMany({ where: { userId: data.userId } }),
+      prisma.refreshToken.create({ data }),
+    ]);
   }
 }
 
