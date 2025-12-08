@@ -53,7 +53,7 @@ class App {
       'DB_NAME',
       'EMAIL_USER',
       'EMAIL_PASS',
-      'AUTH_KEY',
+      'JWT_SECRET',
     ];
 
     const invalidEnvironmentVariables = envVars.some((str) => {
