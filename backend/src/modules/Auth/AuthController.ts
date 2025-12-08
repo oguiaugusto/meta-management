@@ -1,20 +1,26 @@
 import z from 'zod';
 import * as b from 'bcrypt';
+import { v4 } from 'uuid';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { AUTH } from '../../shared/constants/endpoints';
 import { messageFormatters as m } from '../../shared/utils/messageFormatters';
 import { ConflictError } from '../../shared/errors/ConflictError';
-import { UserRepositoryDTO } from './types';
+import { RefreshTokenDTO, UserRepositoryDTO } from './types';
+import { MESSAGES } from '../../shared/constants/messages';
+import { User } from '../../../generated/prisma/client';
+import { UnauthorizedError } from '../../shared/errors/UnauthorizedError';
+import { dayjsUtc } from '../../shared/utils/dayjsUtc';
 import Endpoints from '../../shared/utils/Endpoint';
 import AuthRepository from './AuthRepository';
-import { MESSAGES } from '../../shared/constants/messages';
+import Token from './helpers/Token';
 
 class AuthController {
   constructor(private repo: AuthRepository) {}
 
   public init() {
     Endpoints.route(this.register, 'post', AUTH.register);
+    Endpoints.route(this.login, 'post', AUTH.login);
   }
 
   private get schemas() {
@@ -40,6 +46,13 @@ class AuthController {
         name: keys.name,
         username: keys.username,
         email: keys.email,
+        password: keys.password,
+      }),
+      login: z.object({
+        username: z
+          .string()
+          .min(5, m.min('Username/Email', 5))
+          .max(254, m.max('Username/Email', 254)),
         password: keys.password,
       }),
     };
@@ -70,6 +83,49 @@ class AuthController {
 
     await this.repo.createUser(data);
     res.status(StatusCodes.CREATED).send();
+  };
+
+  private login = async (req: Request, res: Response) => {
+    const x = this.schemas.login.parse(req.body);
+
+    let user: User | null = null;
+
+    const exEmail = await this.repo.findUserByEmail(x.username);
+
+    if (exEmail) {
+      user = exEmail;
+    } else {
+      const exUsername = await this.repo.findUserByUsername(x.username);
+      user = exUsername;
+    }
+
+    const passwordHash = user?.passwordHash || v4();
+    const matchingPassword = await b.compare(x.password, passwordHash);
+
+    if (!user || !matchingPassword) {
+      throw new UnauthorizedError(MESSAGES.incorrectUsernameEmail);
+    }
+
+    const accessToken = await Token.signAccessToken(user.id);
+
+    const refreshToken = Token.createRefreshToken();
+    const tokenHash = Token.hashRefreshToken(refreshToken);
+
+    const refreshTokenDTO: RefreshTokenDTO = {
+      tokenHash,
+      userId: user.id,
+      expiresAt: dayjsUtc.add(7, 'days').toISOString(),
+    };
+
+    await this.repo.createRefreshToken(refreshTokenDTO);
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+    });
+
+    res.status(StatusCodes.OK).json({ accessToken });
   };
 }
 
