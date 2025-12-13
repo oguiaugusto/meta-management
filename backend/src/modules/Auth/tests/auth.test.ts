@@ -146,8 +146,7 @@ describe('Auth Endpoints', () => {
 
       it('should return 401 and error message if username/email is incorrect', async () => {
         mockRepo.findByUsernameOrEmail.mockResolvedValue(null);
-        mockRepo.createRefreshToken.mockResolvedValue(null);
-  
+
         vi.mocked(b.compare).mockResolvedValue(true as any);
   
         const data = { username: 'invalid_email', password: 'valid_password' };
@@ -160,8 +159,7 @@ describe('Auth Endpoints', () => {
       it('should return 401 and error message if password is incorrect', async () => {
         mockRepo.findUserByUsername.mockResolvedValue(mockUser);
         mockRepo.findUserByEmail.mockResolvedValue(null);
-        mockRepo.createRefreshToken.mockResolvedValue(null);
-  
+
         vi.mocked(b.compare).mockResolvedValue(false as any);
   
         const data = { username: mockUser.username, password: 'invalid_password' };
