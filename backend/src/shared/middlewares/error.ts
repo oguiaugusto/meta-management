@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { ZodError } from 'zod';
+import { UnauthorizedError } from '../errors/UnauthorizedError';
 import RequestError from '../errors/RequestError';
 
 type ErrorType = RequestError | ZodError;
@@ -25,6 +26,14 @@ class ErrorMiddleware {
     if (err instanceof RequestError) {
       status = err.status;
       message = err.message;
+    }
+
+    if (err instanceof UnauthorizedError) {
+      res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+      });
     }
 
     console.log(err);
