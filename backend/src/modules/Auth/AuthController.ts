@@ -21,6 +21,7 @@ class AuthController {
   public init() {
     Endpoints.route(this.register, 'post', AUTH.register);
     Endpoints.route(this.login, 'post', AUTH.login);
+    Endpoints.route(this.refresh, 'post', AUTH.refresh);
   }
 
   private get schemas() {
@@ -114,6 +115,42 @@ class AuthController {
     const refreshTokenDTO: RefreshTokenDTO = {
       tokenHash,
       userId: user.id,
+      expiresAt: dayjsUtc.add(7, 'days').toISOString(),
+    };
+
+    await this.repo.createRefreshToken(refreshTokenDTO);
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+    });
+
+    res.status(StatusCodes.OK).json({ accessToken });
+  };
+
+  private refresh = async (req: Request, res: Response) => {
+    const oldToken: string = req.cookies.refreshToken;
+
+    if (!oldToken) {
+      throw new UnauthorizedError(MESSAGES.unauthorized);
+    }
+
+    const oldTokenHash = Token.hashRefreshToken(oldToken);
+    const stored = await this.repo.findRefreshToken(oldTokenHash);
+
+    if (!stored || dayjsUtc.isAfter(stored.expiresAt)) {
+      throw new UnauthorizedError(MESSAGES.unauthorized);
+    }
+
+    const accessToken = await Token.signAccessToken(stored.userId);
+
+    const refreshToken = Token.createRefreshToken();
+    const tokenHash = Token.hashRefreshToken(refreshToken);
+
+    const refreshTokenDTO: RefreshTokenDTO = {
+      tokenHash,
+      userId: stored.userId,
       expiresAt: dayjsUtc.add(7, 'days').toISOString(),
     };
 
