@@ -40,6 +40,7 @@ const beforeCallback = () => {
 
   const mockRepo: Record<keyof AuthRepository, any> = {
     createUser: vi.fn(),
+    updateUser: vi.fn(),
     findUserByUsername: vi.fn(),
     findUserByEmail: vi.fn(),
     findUserByUsernameOrEmail: vi.fn(),
@@ -47,6 +48,8 @@ const beforeCallback = () => {
     findRefreshToken: vi.fn(),
     deleteRefreshToken: vi.fn(),
     createPasswordReset: vi.fn(),
+    findPasswordReset: vi.fn(),
+    deletePasswordReset: vi.fn(),
   };
 
   const authController = new AuthController(mockRepo);
@@ -342,6 +345,67 @@ describe('Auth Endpoints', () => {
         expect(res.body).toEqual({ message: MESSAGES.sentPasswordReset });
 
         expect(sendEmail).not.toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe(`POST ${AUTH.resetPassword}`, () => {
+    const token = Token.hashToken(Token.generateToken());
+
+    describe('on success', () => {
+      beforeEach(() => { 
+        [mockRepo, app, server] = beforeCallback();
+      });
+      
+      afterEach(() => { 
+        server.close();
+      });
+
+      it('should return 200 and success message', async () => {
+        mockRepo.findPasswordReset.mockResolvedValue(mockPasswordReset);
+  
+        const data = { token, newPassword: 'new_password' };
+        const res = await request(app).patch(AUTH.resetPassword).send(data);
+  
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual({ message: MESSAGES.successPasswordReset });
+
+        expect(mockRepo.updateUser).toHaveBeenCalledOnce();
+        expect(mockRepo.deletePasswordReset).toHaveBeenCalledOnce();
+      });
+    });
+
+    describe('on fail', () => {
+      beforeEach(() => { 
+        [mockRepo, app, server] = beforeCallback();
+      });
+
+      afterEach(() => { 
+        server.close();
+      });
+
+      it('should return 400 and error message if token is invalid', async () => {
+        mockRepo.findPasswordReset.mockResolvedValue(null);
+
+        const data = { token: 'invalid_token', newPassword: 'new_password' };
+        const res = await request(app).patch(AUTH.resetPassword).send(data);
+
+        expect(res.status).toBe(400);
+        expect(res.body).toEqual({ message: MESSAGES.invalidPasswordReset });
+      });
+
+      it('should return 400 and error message if token is expired', async () => {
+        const mock: typeof mockPasswordReset = {
+          ...mockPasswordReset,
+          expiresAt: dayjsUtc.subtract(1, 'day').toDate(),
+        };
+        mockRepo.findPasswordReset.mockResolvedValue(mock);
+
+        const data = { token, newPassword: 'new_password' };
+        const res = await request(app).patch(AUTH.resetPassword).send(data);
+
+        expect(res.status).toBe(400);
+        expect(res.body).toEqual({ message: MESSAGES.expiredPasswordReset });
       });
     });
   });
