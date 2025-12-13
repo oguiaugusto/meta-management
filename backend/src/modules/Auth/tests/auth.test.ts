@@ -327,7 +327,7 @@ describe('Auth Endpoints', () => {
         const res = await request(app).post(AUTH.forgotPassword).send(data);
 
         expect(res.status).toBe(200);
-        expect(res.body).toEqual({ message: MESSAGES.passwordReset });
+        expect(res.body).toEqual({ message: MESSAGES.sentPasswordReset });
 
         expect(sendEmail).toHaveBeenCalled();
       });
@@ -339,7 +339,7 @@ describe('Auth Endpoints', () => {
         const res = await request(app).post(AUTH.forgotPassword).send(data);
 
         expect(res.status).toBe(200);
-        expect(res.body).toEqual({ message: MESSAGES.passwordReset });
+        expect(res.body).toEqual({ message: MESSAGES.sentPasswordReset });
 
         expect(sendEmail).not.toHaveBeenCalled();
       });

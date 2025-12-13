@@ -198,7 +198,7 @@ class AuthController {
       await sendPasswordResetEmail(x.email, link);
     }
 
-    res.status(StatusCodes.OK).json({ message: MESSAGES.passwordReset });
+    res.status(StatusCodes.OK).json({ message: MESSAGES.sentPasswordReset });
   };
 }
 
