@@ -6,6 +6,10 @@ class AuthRepository {
     return prisma.user.create({ data });
   }
 
+  public async updateUser(id: string, data: Partial<UserRepositoryDTO>) {
+    return prisma.user.update({ where: { id }, data });
+  }
+
   public async findUserByUsername(username: string) {
     return prisma.user.findUnique({ where: { username } });
   }
