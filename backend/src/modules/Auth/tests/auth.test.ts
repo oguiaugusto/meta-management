@@ -71,11 +71,11 @@ describe('Auth Endpoints', () => {
   describe(`POST ${AUTH.register}`, () => {
     describe('on success', () => {
       beforeEach(() => { 
-        [mockRepo, app, server] = beforeCallback(); 
+        [mockRepo, app, server] = beforeCallback();
       });
       
       afterEach(() => { 
-        server.close(); 
+        server.close();
       });
 
       it('should return 201 and no content', async () => {
@@ -93,11 +93,11 @@ describe('Auth Endpoints', () => {
 
     describe('on fail', () => {
       beforeEach(() => { 
-        [mockRepo, app, server] = beforeCallback(); 
+        [mockRepo, app, server] = beforeCallback();
       });
       
       afterEach(() => { 
-        server.close(); 
+        server.close();
       });
   
       it('should return 409 and an error message if username already exists', async () => {
@@ -126,11 +126,11 @@ describe('Auth Endpoints', () => {
   describe(`POST ${AUTH.login}`, () => {
     describe('on success', () => {
       beforeEach(() => { 
-        [mockRepo, app, server] = beforeCallback(); 
+        [mockRepo, app, server] = beforeCallback();
       });
       
       afterEach(() => { 
-        server.close(); 
+        server.close();
       });
 
       it('should return 200, access token, and refresh token if username/email and password are correct', async () => {
@@ -153,11 +153,11 @@ describe('Auth Endpoints', () => {
 
     describe('on fail', () => {
       beforeEach(() => { 
-        [mockRepo, app, server] = beforeCallback(); 
+        [mockRepo, app, server] = beforeCallback();
       });
       
       afterEach(() => { 
-        server.close(); 
+        server.close();
       });
 
       it('should return 401 and error message if username/email is incorrect', async () => {
@@ -194,11 +194,11 @@ describe('Auth Endpoints', () => {
   describe(`POST ${AUTH.refresh}`, () => {
     describe('on success', () => {
       beforeEach(() => { 
-        [mockRepo, app, server] = beforeCallback(); 
+        [mockRepo, app, server] = beforeCallback();
       });
       
       afterEach(() => { 
-        server.close(); 
+        server.close();
       });
 
       it('should return 200, access token, and a new refresh token if the old one exists and is not expired', async () => {
@@ -220,11 +220,11 @@ describe('Auth Endpoints', () => {
 
     describe('on fail', () => {
       beforeEach(() => { 
-        [mockRepo, app, server] = beforeCallback(); 
+        [mockRepo, app, server] = beforeCallback();
       });
       
       afterEach(() => { 
-        server.close(); 
+        server.close();
       });
 
       it('should return 401 and error message if refresh token is not sent', async () => {
@@ -271,11 +271,12 @@ describe('Auth Endpoints', () => {
   describe(`POST ${AUTH.logout}`, () => {
     describe('on success', () => {
       beforeEach(() => { 
-        [mockRepo, app, server] = beforeCallback(); 
+        [mockRepo, app, server] = beforeCallback();
+        vi.clearAllMocks();
       });
       
       afterEach(() => { 
-        server.close(); 
+        server.close();
       });
 
       it('should return 200 and clear refresh token', async () => {
@@ -284,6 +285,8 @@ describe('Auth Endpoints', () => {
           .set('Cookie', `refreshToken=${mockRefreshToken.tokenHash}`);
 
         expect(res.status).toBe(200);
+        expect(mockRepo.deleteRefreshToken).toHaveBeenCalled();
+
         expectRefreshTokenCleared(res);
       });
 
@@ -291,6 +294,8 @@ describe('Auth Endpoints', () => {
         const res = await request(app).post(AUTH.logout)
 
         expect(res.status).toBe(200);
+        expect(mockRepo.deleteRefreshToken).not.toHaveBeenCalled();
+
         expectRefreshTokenCleared(res);
       });
     });
