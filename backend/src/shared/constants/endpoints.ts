@@ -3,4 +3,6 @@ export const AUTH = {
   login: '/auth/login',
   refresh: '/auth/refresh',
   logout: '/auth/logout',
+  forgotPassword: '/auth/forgot-password',
+  resetPassword: '/auth/reset-password',
 };

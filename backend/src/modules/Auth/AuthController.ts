@@ -6,11 +6,11 @@ import { StatusCodes } from 'http-status-codes';
 import { AUTH } from '../../shared/constants/endpoints';
 import { messageFormatters as m } from '../../shared/utils/messageFormatters';
 import { ConflictError } from '../../shared/errors/ConflictError';
-import { RefreshTokenDTO, UserRepositoryDTO } from './types';
+import { PasswordResetDTO, RefreshTokenDTO, UserRepositoryDTO } from './types';
 import { MESSAGES } from '../../shared/constants/messages';
-import { User } from '../../../generated/prisma/client';
 import { UnauthorizedError } from '../../shared/errors/UnauthorizedError';
 import { dayjsUtc } from '../../shared/utils/dayjsUtc';
+import { sendPasswordResetEmail } from '../../shared/email/sendPasswordResetEmail';
 import Endpoints from '../../shared/utils/Endpoint';
 import AuthRepository from './AuthRepository';
 import Token from './helpers/Token';
@@ -23,6 +23,7 @@ class AuthController {
     Endpoints.route(this.login, 'post', AUTH.login);
     Endpoints.route(this.refresh, 'post', AUTH.refresh);
     Endpoints.route(this.logout, 'post', AUTH.logout);
+    Endpoints.route(this.forgotPassword, 'post', AUTH.forgotPassword);
   }
 
   private get schemas() {
@@ -56,6 +57,10 @@ class AuthController {
           .min(5, m.min('Username/Email', 5))
           .max(254, m.max('Username/Email', 254)),
         password: keys.password,
+      }),
+      forgotPassword: z.object({
+        email: z.email(m.email()),
+        host: z.string(),
       }),
     };
   }
@@ -172,6 +177,28 @@ class AuthController {
     });
 
     res.status(StatusCodes.OK).send();
+  };
+
+  private forgotPassword = async (req: Request, res: Response) => {
+    const x = this.schemas.forgotPassword.parse(req.body);
+
+    const user = await this.repo.findUserByEmail(x.email);
+
+    if (user) {
+      const token = Token.generateToken();
+      const data: PasswordResetDTO = {
+        userId: user.id,
+        tokenHash: Token.hashToken(token),
+        expiresAt: dayjsUtc.add(30, 'minutes').toISOString(),
+      };
+
+      const link = `${x.host}${AUTH.resetPassword}/${token}`;
+
+      await this.repo.createPasswordReset(data);
+      await sendPasswordResetEmail(x.email, link);
+    }
+
+    res.status(StatusCodes.OK).json({ message: MESSAGES.passwordReset });
   };
 }
 
