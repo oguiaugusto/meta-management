@@ -103,7 +103,7 @@ class AuthController {
     const matchingPassword = await b.compare(x.password, passwordHash);
 
     if (!user || !matchingPassword) {
-      throw new UnauthorizedError(MESSAGES.incorrectUsernameEmail);
+      throw new UnauthorizedError(MESSAGES.wrongCredentials);
     }
 
     const accessToken = await Token.signAccessToken(user.id);
