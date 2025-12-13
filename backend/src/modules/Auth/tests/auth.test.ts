@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { Express, Router } from 'express';
-import request from 'supertest';
+import request, { Response } from 'supertest';
 import App from '../../../config/app';
 import AuthRepository from '../AuthRepository';
 import AuthController from '../AuthController';
@@ -48,6 +48,17 @@ const beforeCallback = () => {
   const server = mockApp.start(1441);
 
   return [mockRepo, app, server] as [typeof mockRepo, typeof app, typeof server];
+};
+
+const expectRefreshToken = (res: Response) => {
+  expect(res.headers['set-cookie'][0]).toContain('refreshToken=');
+  expect(res.headers['set-cookie'][0]).toContain('HttpOnly');
+  expect(res.headers['set-cookie'][0]).toContain('SameSite=Lax');
+};
+
+const expectRefreshTokenCleared = (res: Response) => {
+  expect(res.headers['set-cookie'][0]).toContain('refreshToken=;');
+  expect(res.headers['set-cookie'][0]).toContain('Expires=Thu, 01 Jan 1970 00:00:00 GMT');
 };
 
 describe('Auth Endpoints', () => {
@@ -121,7 +132,7 @@ describe('Auth Endpoints', () => {
         server.close(); 
       });
 
-      it('should return 200 and access token if username/email and password are correct', async () => {
+      it('should return 200, access token, and refresh token if username/email and password are correct', async () => {
         mockRepo.findByUsernameOrEmail.mockResolvedValue(mockUser);
         mockRepo.createRefreshToken.mockResolvedValue(mockRefreshToken);
   
@@ -134,6 +145,8 @@ describe('Auth Endpoints', () => {
   
         expect(res.status).toBe(200);
         expect(res.body).toEqual({ accessToken });
+
+        expectRefreshToken(res);
       });
     });
 
@@ -156,6 +169,8 @@ describe('Auth Endpoints', () => {
 
         expect(res.status).toBe(401);
         expect(res.body).toEqual({ message: MESSAGES.wrongCredentials });
+
+        expectRefreshTokenCleared(res);
       });
 
       it('should return 401 and error message if password is incorrect', async () => {
@@ -169,6 +184,8 @@ describe('Auth Endpoints', () => {
 
         expect(res.status).toBe(401);
         expect(res.body).toEqual({ message: MESSAGES.wrongCredentials });
+
+        expectRefreshTokenCleared(res);
       });
     });
   });
@@ -183,7 +200,7 @@ describe('Auth Endpoints', () => {
         server.close(); 
       });
 
-      it('should return 200 and access token if refresh token exists and is not expired', async () => {
+      it('should return 200, access token, and a new refresh token if the old one exists and is not expired', async () => {
         mockRepo.findRefreshToken.mockResolvedValue(mockRefreshToken);
         mockRepo.createRefreshToken.mockResolvedValue(mockRefreshToken);
 
@@ -195,6 +212,8 @@ describe('Auth Endpoints', () => {
 
         expect(res.status).toBe(200);
         expect(res.body).toEqual({ accessToken });
+
+        expectRefreshToken(res);
       });
     });
 
@@ -212,6 +231,8 @@ describe('Auth Endpoints', () => {
 
         expect(res.status).toBe(401);
         expect(res.body).toEqual({ message: MESSAGES.unauthorized });
+
+        expectRefreshTokenCleared(res);
       });
 
       it('should return 401 and error message if refresh token is not found', async () => {
@@ -223,6 +244,8 @@ describe('Auth Endpoints', () => {
 
         expect(res.status).toBe(401);
         expect(res.body).toEqual({ message: MESSAGES.unauthorized });
+
+        expectRefreshTokenCleared(res);
       });
 
       it('should return 401 and error message if refresh token is expired', async () => {
@@ -238,6 +261,8 @@ describe('Auth Endpoints', () => {
 
         expect(res.status).toBe(401);
         expect(res.body).toEqual({ message: MESSAGES.unauthorized });
+
+        expectRefreshTokenCleared(res);
       });
     });
   });
