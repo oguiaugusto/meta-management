@@ -14,6 +14,17 @@ class AuthRepository {
     return prisma.user.findUnique({ where: { email } });
   }
 
+  public async findByUsernameOrEmail(value: string) {
+    return prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: value },
+          { username: value },
+        ],
+      },
+    });
+  }
+
   public async createRefreshToken (data: RefreshTokenDTO) {
     await prisma.$transaction([
       prisma.refreshToken.deleteMany({ where: { userId: data.userId } }),

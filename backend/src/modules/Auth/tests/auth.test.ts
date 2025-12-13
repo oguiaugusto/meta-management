@@ -31,10 +31,11 @@ let baseUserTest: UserDTO = {
 const beforeCallback = () => {
   Endpoints.router = Router();
 
-  const mockRepo = {
+  const mockRepo: Record<keyof AuthRepository, any> = {
     createUser: vi.fn(),
     findUserByUsername: vi.fn(),
     findUserByEmail: vi.fn(),
+    findByUsernameOrEmail: vi.fn(),
     createRefreshToken: vi.fn(),
   };
 
@@ -51,12 +52,7 @@ describe('Auth Endpoints', () => {
   let app: Express;
   let server: ReturnType<InstanceType<typeof App>['start']>;
 
-  let mockRepo: {
-    createUser: ReturnType<typeof vi.fn>;
-    findUserByUsername: ReturnType<typeof vi.fn>;
-    findUserByEmail: ReturnType<typeof vi.fn>;
-    createRefreshToken: ReturnType<typeof vi.fn>;
-  };
+  let mockRepo: Record<keyof AuthRepository, ReturnType<typeof vi.fn>>;
 
   describe(`POST ${AUTH.register}`, () => {
     describe('on success', () => {
@@ -123,30 +119,13 @@ describe('Auth Endpoints', () => {
         server.close(); 
       });
 
-      it('should return 200 and access token if email and password are correct', async () => {
-        mockRepo.findUserByUsername.mockResolvedValue(null);
-        mockRepo.findUserByEmail.mockResolvedValue(mockUser);
+      it('should return 200 and access token if username/email and password are correct', async () => {
+        mockRepo.findByUsernameOrEmail.mockResolvedValue(mockUser);
         mockRepo.createRefreshToken.mockResolvedValue(mockRefreshToken);
   
         vi.mocked(b.compare).mockResolvedValue(true as any);
   
         const data = { username: mockUser.email, password: 'valid_password' };
-        const res = await request(app).post(AUTH.login).send(data);
-
-        const accessToken = await Token.signAccessToken(mockUser.id)
-  
-        expect(res.status).toBe(200);
-        expect(res.body).toEqual({ accessToken });
-      });
-
-      it('should return 200 and access token if username and password are correct', async () => {
-        mockRepo.findUserByEmail.mockResolvedValue(null);
-        mockRepo.findUserByUsername.mockResolvedValue(mockUser);
-        mockRepo.createRefreshToken.mockResolvedValue(mockRefreshToken);
-  
-        vi.mocked(b.compare).mockResolvedValue(true as any);
-  
-        const data = { username: mockUser.username, password: 'valid_password' };
         const res = await request(app).post(AUTH.login).send(data);
 
         const accessToken = await Token.signAccessToken(mockUser.id)
@@ -165,9 +144,8 @@ describe('Auth Endpoints', () => {
         server.close(); 
       });
 
-      it('should return 401 and error message if username and email are incorrect', async () => {
-        mockRepo.findUserByUsername.mockResolvedValue(null);
-        mockRepo.findUserByEmail.mockResolvedValue(null);
+      it('should return 401 and error message if username/email is incorrect', async () => {
+        mockRepo.findByUsernameOrEmail.mockResolvedValue(null);
         mockRepo.createRefreshToken.mockResolvedValue(null);
   
         vi.mocked(b.compare).mockResolvedValue(true as any);
