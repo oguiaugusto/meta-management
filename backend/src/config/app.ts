@@ -1,4 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
+import cookieParser from 'cookie-parser';
 import express from 'express';
 import cors from 'cors';
 import ErrorMiddleware from '../shared/middlewares/error';
@@ -33,6 +34,8 @@ class App {
 
     this.app.use(accessControl);
     this.app.use(cors());
+
+    this.app.use(cookieParser());
     this.app.use(express.json({ limit: '6mb' }));
   }
 

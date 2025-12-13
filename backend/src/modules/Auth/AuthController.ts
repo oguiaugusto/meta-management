@@ -121,7 +121,7 @@ class AuthController {
   };
 
   private refresh = async (req: Request, res: Response) => {
-    const oldToken: string = req.cookies.refreshToken;
+    const oldToken: string = req.cookies?.refreshToken;
 
     if (!oldToken) {
       throw new UnauthorizedError(MESSAGES.unauthorized);
