@@ -90,7 +90,7 @@ class AuthController {
   private login = async (req: Request, res: Response) => {
     const x = this.schemas.login.parse(req.body);
 
-    const user = await this.repo.findByUsernameOrEmail(x.username);
+    const user = await this.repo.findUserByUsernameOrEmail(x.username);
 
     const passwordHash = user?.passwordHash || v4();
     const matchingPassword = await b.compare(x.password, passwordHash);

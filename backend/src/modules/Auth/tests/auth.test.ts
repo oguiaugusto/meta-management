@@ -36,7 +36,7 @@ const beforeCallback = () => {
     createUser: vi.fn(),
     findUserByUsername: vi.fn(),
     findUserByEmail: vi.fn(),
-    findByUsernameOrEmail: vi.fn(),
+    findUserByUsernameOrEmail: vi.fn(),
     createRefreshToken: vi.fn(),
     findRefreshToken: vi.fn(),
     deleteRefreshToken: vi.fn(),
@@ -134,7 +134,7 @@ describe('Auth Endpoints', () => {
       });
 
       it('should return 200, access token, and refresh token if username/email and password are correct', async () => {
-        mockRepo.findByUsernameOrEmail.mockResolvedValue(mockUser);
+        mockRepo.findUserByUsernameOrEmail.mockResolvedValue(mockUser);
         mockRepo.createRefreshToken.mockResolvedValue(mockRefreshToken);
   
         vi.mocked(b.compare).mockResolvedValue(true as any);
@@ -161,7 +161,7 @@ describe('Auth Endpoints', () => {
       });
 
       it('should return 401 and error message if username/email is incorrect', async () => {
-        mockRepo.findByUsernameOrEmail.mockResolvedValue(null);
+        mockRepo.findUserByUsernameOrEmail.mockResolvedValue(null);
 
         vi.mocked(b.compare).mockResolvedValue(true as any);
   

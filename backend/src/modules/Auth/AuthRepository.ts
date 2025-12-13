@@ -14,7 +14,7 @@ class AuthRepository {
     return prisma.user.findUnique({ where: { email } });
   }
 
-  public async findByUsernameOrEmail(value: string) {
+  public async findUserByUsernameOrEmail(value: string) {
     return prisma.user.findFirst({
       where: {
         OR: [
