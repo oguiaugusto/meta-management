@@ -39,6 +39,7 @@ const beforeCallback = () => {
     findByUsernameOrEmail: vi.fn(),
     createRefreshToken: vi.fn(),
     findRefreshToken: vi.fn(),
+    deleteRefreshToken: vi.fn(),
   };
 
   const authController = new AuthController(mockRepo);
@@ -262,6 +263,34 @@ describe('Auth Endpoints', () => {
         expect(res.status).toBe(401);
         expect(res.body).toEqual({ message: MESSAGES.unauthorized });
 
+        expectRefreshTokenCleared(res);
+      });
+    });
+  });
+
+  describe(`POST ${AUTH.logout}`, () => {
+    describe('on success', () => {
+      beforeEach(() => { 
+        [mockRepo, app, server] = beforeCallback(); 
+      });
+      
+      afterEach(() => { 
+        server.close(); 
+      });
+
+      it('should return 200 and clear refresh token', async () => {
+        const res = await request(app)
+          .post(AUTH.logout)
+          .set('Cookie', `refreshToken=${mockRefreshToken.tokenHash}`);
+
+        expect(res.status).toBe(200);
+        expectRefreshTokenCleared(res);
+      });
+
+      it('should return 200 and clear refresh token regardless if invalid or inexistent', async () => {
+        const res = await request(app).post(AUTH.logout)
+
+        expect(res.status).toBe(200);
         expectRefreshTokenCleared(res);
       });
     });
