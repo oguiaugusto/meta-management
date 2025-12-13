@@ -46,6 +46,14 @@ class AuthRepository {
       prisma.passwordReset.create({ data }),
     ]);
   }
+
+  public async findPasswordReset (tokenHash: string) {
+    return prisma.passwordReset.findUnique({ where: { tokenHash } });
+  }
+
+  public async deletePasswordReset (tokenHash: string) {
+    await prisma.passwordReset.deleteMany({ where: { tokenHash } });
+  }
 }
 
 export default AuthRepository;
