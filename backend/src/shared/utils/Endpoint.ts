@@ -1,7 +1,7 @@
 import rescue from 'express-rescue';
 import { Request, Response, Router } from 'express';
 
-type Method = 'get' | 'post' | 'put' | 'delete';
+type Method = 'get' | 'post' | 'put' | 'patch' | 'delete';
 type Handler = (req: Request, res: Response) => Promise<void>;
 
 class Endpoints {
