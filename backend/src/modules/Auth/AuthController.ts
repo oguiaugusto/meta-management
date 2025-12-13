@@ -6,9 +6,10 @@ import { StatusCodes } from 'http-status-codes';
 import { AUTH } from '../../shared/constants/endpoints';
 import { messageFormatters as m } from '../../shared/utils/messageFormatters';
 import { ConflictError } from '../../shared/errors/ConflictError';
+import { UnauthorizedError } from '../../shared/errors/UnauthorizedError';
+import { BadRequestError } from '../../shared/errors/BadRequestError';
 import { PasswordResetDTO, RefreshTokenDTO, UserRepositoryDTO } from './types';
 import { MESSAGES } from '../../shared/constants/messages';
-import { UnauthorizedError } from '../../shared/errors/UnauthorizedError';
 import { dayjsUtc } from '../../shared/utils/dayjsUtc';
 import { sendPasswordResetEmail } from '../../shared/email/sendPasswordResetEmail';
 import Endpoints from '../../shared/utils/Endpoint';
@@ -24,6 +25,7 @@ class AuthController {
     Endpoints.route(this.refresh, 'post', AUTH.refresh);
     Endpoints.route(this.logout, 'post', AUTH.logout);
     Endpoints.route(this.forgotPassword, 'post', AUTH.forgotPassword);
+    Endpoints.route(this.resetPassword, 'patch', AUTH.resetPassword);
   }
 
   private get schemas() {
@@ -61,6 +63,13 @@ class AuthController {
       forgotPassword: z.object({
         email: z.email(m.email()),
         host: z.string(),
+      }),
+      resetPassword: z.object({
+        token: z.string(),
+        newPassword: z
+          .string(m.required('Password'))
+          .min(6, m.min('Password', 6))
+          .max(30, m.max('Password', 30)),
       }),
     };
   }
@@ -199,6 +208,29 @@ class AuthController {
     }
 
     res.status(StatusCodes.OK).json({ message: MESSAGES.sentPasswordReset });
+  };
+
+  private resetPassword = async (req: Request, res: Response) => {
+    const x = this.schemas.resetPassword.parse(req.body);
+
+    const tokenHash = Token.hashToken(x.token);
+    const passwordReset = await this.repo.findPasswordReset(tokenHash);
+
+    if (!passwordReset) {
+      throw new BadRequestError(MESSAGES.invalidPasswordReset);
+    }
+
+    if (dayjsUtc.isAfter(passwordReset.expiresAt)) {
+      throw new BadRequestError(MESSAGES.expiredPasswordReset);
+    }
+
+    const salt = await b.genSalt(11);
+    const passwordHash = await b.hash(x.newPassword, salt);
+
+    await this.repo.updateUser(passwordReset.userId, { passwordHash });
+    await this.repo.deletePasswordReset(tokenHash);
+
+    res.status(StatusCodes.OK).json({ message: MESSAGES.successPasswordReset })
   };
 }
 
