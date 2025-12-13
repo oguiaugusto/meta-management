@@ -1,4 +1,4 @@
-import { User } from '../../../../generated/prisma/client';
+import { RefreshToken, User } from '../../../../generated/prisma/client';
 
 export const mockUser: User = {
   id: 'uuid',
@@ -10,4 +10,12 @@ export const mockUser: User = {
   emailVerifiedAt: null,
   createdAt: new Date(),
   updatedAt: new Date(),
+};
+
+export const mockRefreshToken: RefreshToken = {
+  id: 'uuid',
+  userId: mockUser.id,
+  tokenHash: 'token-hash',
+  createdAt: new Date(),
+  expiresAt: new Date(),
 };

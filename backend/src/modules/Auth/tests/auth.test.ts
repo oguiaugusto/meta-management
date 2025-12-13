@@ -6,9 +6,20 @@ import AuthRepository from '../AuthRepository';
 import AuthController from '../AuthController';
 import Endpoints from '../../../shared/utils/Endpoint';
 import { AUTH } from '../../../shared/constants/endpoints';
-import { mockUser } from './data';
+import { mockRefreshToken, mockUser } from './data';
 import { UserDTO } from '../types';
 import { MESSAGES } from '../../../shared/constants/messages';
+
+import * as b from 'bcrypt';
+import Token from '../helpers/Token';
+vi.mock('bcrypt', async () => {
+  const actual = await vi.importActual<typeof import('bcrypt')>('bcrypt');
+
+  return {
+    ...actual,
+    compare: vi.fn(),
+  }
+});
 
 let baseUserTest: UserDTO = {
   username: 'usernametest',
@@ -92,12 +103,94 @@ describe('Auth Endpoints', () => {
       it('should return 409 and an error message if email already exists', async () => {
         mockRepo.findUserByUsername.mockResolvedValue(null);
         mockRepo.findUserByEmail.mockResolvedValue(mockUser);
-  
+
         const data = { ...baseUserTest, email: mockUser.email };
         const res = await request(app).post(AUTH.register).send(data);
   
         expect(res.status).toBe(409);
         expect(res.body).toEqual({ message: MESSAGES.uniqueEmail });
+      });
+    });
+  });
+
+  describe(`POST ${AUTH.login}`, () => {
+    describe('on success', () => {
+      beforeEach(() => { 
+        [mockRepo, app, server] = beforeCallback(); 
+      });
+      
+      afterEach(() => { 
+        server.close(); 
+      });
+
+      it('should return 200 and access token if email and password are correct', async () => {
+        mockRepo.findUserByUsername.mockResolvedValue(null);
+        mockRepo.findUserByEmail.mockResolvedValue(mockUser);
+        mockRepo.createRefreshToken.mockResolvedValue(mockRefreshToken);
+  
+        vi.mocked(b.compare).mockResolvedValue(true as any);
+  
+        const data = { username: mockUser.email, password: 'valid_password' };
+        const res = await request(app).post(AUTH.login).send(data);
+
+        const accessToken = await Token.signAccessToken(mockUser.id)
+  
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual({ accessToken });
+      });
+
+      it('should return 200 and access token if username and password are correct', async () => {
+        mockRepo.findUserByEmail.mockResolvedValue(null);
+        mockRepo.findUserByUsername.mockResolvedValue(mockUser);
+        mockRepo.createRefreshToken.mockResolvedValue(mockRefreshToken);
+  
+        vi.mocked(b.compare).mockResolvedValue(true as any);
+  
+        const data = { username: mockUser.username, password: 'valid_password' };
+        const res = await request(app).post(AUTH.login).send(data);
+
+        const accessToken = await Token.signAccessToken(mockUser.id)
+  
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual({ accessToken });
+      });
+    });
+
+    describe('on fail', () => {
+      beforeEach(() => { 
+        [mockRepo, app, server] = beforeCallback(); 
+      });
+      
+      afterEach(() => { 
+        server.close(); 
+      });
+
+      it('should return 401 and error message if username and email are incorrect', async () => {
+        mockRepo.findUserByUsername.mockResolvedValue(null);
+        mockRepo.findUserByEmail.mockResolvedValue(null);
+        mockRepo.createRefreshToken.mockResolvedValue(null);
+  
+        vi.mocked(b.compare).mockResolvedValue(true as any);
+  
+        const data = { username: 'invalid_email', password: 'valid_password' };
+        const res = await request(app).post(AUTH.login).send(data);
+
+        expect(res.status).toBe(401);
+        expect(res.body).toEqual({ message: MESSAGES.wrongCredentials });
+      });
+
+      it('should return 401 and error message if password is incorrect', async () => {
+        mockRepo.findUserByUsername.mockResolvedValue(mockUser);
+        mockRepo.findUserByEmail.mockResolvedValue(null);
+        mockRepo.createRefreshToken.mockResolvedValue(null);
+  
+        vi.mocked(b.compare).mockResolvedValue(false as any);
+  
+        const data = { username: mockUser.username, password: 'invalid_password' };
+        const res = await request(app).post(AUTH.login).send(data);
+
+        expect(res.status).toBe(401);
+        expect(res.body).toEqual({ message: MESSAGES.wrongCredentials });
       });
     });
   });
