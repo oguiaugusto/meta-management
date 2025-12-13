@@ -101,8 +101,8 @@ class AuthController {
 
     const accessToken = await Token.signAccessToken(user.id);
 
-    const refreshToken = Token.createRefreshToken();
-    const tokenHash = Token.hashRefreshToken(refreshToken);
+    const refreshToken = Token.generateToken();
+    const tokenHash = Token.hashToken(refreshToken);
 
     const refreshTokenDTO: RefreshTokenDTO = {
       tokenHash,
@@ -128,7 +128,7 @@ class AuthController {
       throw new UnauthorizedError(MESSAGES.unauthorized);
     }
 
-    const oldTokenHash = Token.hashRefreshToken(oldToken);
+    const oldTokenHash = Token.hashToken(oldToken);
     const stored = await this.repo.findRefreshToken(oldTokenHash);
 
     if (!stored || dayjsUtc.isAfter(stored.expiresAt)) {
@@ -137,8 +137,8 @@ class AuthController {
 
     const accessToken = await Token.signAccessToken(stored.userId);
 
-    const refreshToken = Token.createRefreshToken();
-    const tokenHash = Token.hashRefreshToken(refreshToken);
+    const refreshToken = Token.generateToken();
+    const tokenHash = Token.hashToken(refreshToken);
 
     const refreshTokenDTO: RefreshTokenDTO = {
       tokenHash,
@@ -161,7 +161,7 @@ class AuthController {
     const refreshToken: string = req.cookies?.refreshToken;
 
     if (refreshToken) {
-      const tokenHash = Token.hashRefreshToken(refreshToken);
+      const tokenHash = Token.hashToken(refreshToken);
       await this.repo.deleteRefreshToken(tokenHash);
     }
 

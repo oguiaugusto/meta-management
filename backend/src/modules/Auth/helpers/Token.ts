@@ -19,11 +19,11 @@ class Token {
     return payload;
   }
 
-  public static createRefreshToken() {
+  public static generateToken() {
     return crypto.randomBytes(48).toString('hex');
   }
 
-  public static hashRefreshToken(token: string) {
+  public static hashToken(token: string) {
     return crypto.createHash('sha256').update(token).digest('hex');
   }
 }
