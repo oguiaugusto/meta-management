@@ -26,7 +26,7 @@ model RefreshToken {
   id        String   @id @default(uuid())
   userId    String   @db.VarChar(36)
   user      User     @relation(fields: [userId], references: [id])
-  tokenHash String   @db.VarChar(64)
+  tokenHash String   @unique @db.VarChar(64)
   expiresAt DateTime
   createdAt DateTime @default(now())
 

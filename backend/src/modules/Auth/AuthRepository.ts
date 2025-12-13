@@ -22,7 +22,7 @@ class AuthRepository {
   }
 
   public async findRefreshToken (tokenHash: string) {
-    return prisma.refreshToken.findFirst({ where: { tokenHash } });
+    return prisma.refreshToken.findUnique({ where: { tokenHash } });
   }
 }
 
