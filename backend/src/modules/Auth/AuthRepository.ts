@@ -35,6 +35,10 @@ class AuthRepository {
   public async findRefreshToken (tokenHash: string) {
     return prisma.refreshToken.findUnique({ where: { tokenHash } });
   }
+
+  public async deleteRefreshToken (tokenHash: string) {
+    await prisma.refreshToken.deleteMany({ where: { tokenHash } });
+  }
 }
 
 export default AuthRepository;
