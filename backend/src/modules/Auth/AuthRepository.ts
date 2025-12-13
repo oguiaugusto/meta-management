@@ -20,6 +20,10 @@ class AuthRepository {
       prisma.refreshToken.create({ data }),
     ]);
   }
+
+  public async findRefreshToken (tokenHash: string) {
+    return prisma.refreshToken.findFirst({ where: { tokenHash } });
+  }
 }
 
 export default AuthRepository;
