@@ -22,6 +22,7 @@ class AuthController {
     Endpoints.route(this.register, 'post', AUTH.register);
     Endpoints.route(this.login, 'post', AUTH.login);
     Endpoints.route(this.refresh, 'post', AUTH.refresh);
+    Endpoints.route(this.logout, 'post', AUTH.logout);
   }
 
   private get schemas() {
@@ -154,6 +155,23 @@ class AuthController {
     });
 
     res.status(StatusCodes.OK).json({ accessToken });
+  };
+
+  private logout = async (req: Request, res: Response) => {
+    const refreshToken: string = req.cookies?.refreshToken;
+
+    if (refreshToken) {
+      const tokenHash = Token.hashRefreshToken(refreshToken);
+      await this.repo.deleteRefreshToken(tokenHash);
+    }
+
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+    });
+
+    res.status(StatusCodes.OK).send();
   };
 }
 
