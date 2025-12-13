@@ -6,13 +6,15 @@ import AuthRepository from '../AuthRepository';
 import AuthController from '../AuthController';
 import Endpoints from '../../../shared/utils/Endpoint';
 import { AUTH } from '../../../shared/constants/endpoints';
-import { mockRefreshToken, mockUser } from './data';
+import { mockPasswordReset, mockRefreshToken, mockUser } from './data';
 import { UserDTO } from '../types';
 import { MESSAGES } from '../../../shared/constants/messages';
+import { dayjsUtc } from '../../../shared/utils/dayjsUtc';
+import Token from '../helpers/Token';
 
 import * as b from 'bcrypt';
-import Token from '../helpers/Token';
-import { dayjsUtc } from '../../../shared/utils/dayjsUtc';
+import { sendEmail } from '../../../shared/email/sendEmail';
+
 vi.mock('bcrypt', async () => {
   const actual = await vi.importActual<typeof import('bcrypt')>('bcrypt');
 
@@ -21,6 +23,10 @@ vi.mock('bcrypt', async () => {
     compare: vi.fn(),
   }
 });
+
+vi.mock('../../../shared/email/sendEmail.ts', () => ({
+  sendEmail: vi.fn(),
+}));
 
 let baseUserTest: UserDTO = {
   username: 'usernametest',
@@ -40,6 +46,7 @@ const beforeCallback = () => {
     createRefreshToken: vi.fn(),
     findRefreshToken: vi.fn(),
     deleteRefreshToken: vi.fn(),
+    createPasswordReset: vi.fn(),
   };
 
   const authController = new AuthController(mockRepo);
@@ -297,6 +304,44 @@ describe('Auth Endpoints', () => {
         expect(mockRepo.deleteRefreshToken).not.toHaveBeenCalled();
 
         expectRefreshTokenCleared(res);
+      });
+    });
+  });
+
+  describe(`POST ${AUTH.forgotPassword}`, () => {
+    describe('on success', () => {
+      beforeEach(() => { 
+        [mockRepo, app, server] = beforeCallback();
+        vi.clearAllMocks();
+      });
+      
+      afterEach(() => { 
+        server.close();
+      });
+
+      it('should return 200 and success message', async () => {
+        mockRepo.findUserByEmail.mockResolvedValue(mockUser);
+        mockRepo.createPasswordReset.mockResolvedValue(mockPasswordReset);
+
+        const data = { host: 'http://localhost:3000', email: mockUser.email };
+        const res = await request(app).post(AUTH.forgotPassword).send(data);
+
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual({ message: MESSAGES.passwordReset });
+
+        expect(sendEmail).toHaveBeenCalled();
+      });
+
+      it('should return 200 and success message regardless if user exists', async () => {
+        mockRepo.findUserByEmail.mockResolvedValue(null);
+
+        const data = { host: 'http://localhost:3000', email: 'invalid@email.com' };
+        const res = await request(app).post(AUTH.forgotPassword).send(data);
+
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual({ message: MESSAGES.passwordReset });
+
+        expect(sendEmail).not.toHaveBeenCalled();
       });
     });
   });
