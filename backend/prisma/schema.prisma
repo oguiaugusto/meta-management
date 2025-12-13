@@ -35,7 +35,7 @@ model RefreshToken {
 
 model PasswordReset {
   id        String   @id @default(uuid())
-  userId    String   @db.VarChar(36)
+  userId    String   @unique @db.VarChar(36)
   user      User     @relation(fields: [userId], references: [id])
   tokenHash String   @db.VarChar(64)
   expiresAt DateTime
@@ -46,7 +46,7 @@ model PasswordReset {
 
 model EmailChangeRequest {
   id        String   @id @default(uuid())
-  userId    String   @db.VarChar(36)
+  userId    String   @unique @db.VarChar(36)
   user      User     @relation(fields: [userId], references: [id])
   newEmail  String   @db.VarChar(254)
   tokenHash String   @db.VarChar(64)
