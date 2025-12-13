@@ -14,3 +14,9 @@ export type RefreshTokenDTO = {
   tokenHash: string;
   expiresAt: string;
 };
+
+export type PasswordResetDTO = {
+  userId: string;
+  tokenHash: string;
+  expiresAt: string;
+};

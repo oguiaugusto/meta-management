@@ -1,5 +1,5 @@
 import { prisma } from '../../../database/prisma';
-import { RefreshTokenDTO, UserRepositoryDTO } from './types';
+import { PasswordResetDTO, RefreshTokenDTO, UserRepositoryDTO } from './types';
 
 class AuthRepository {
   public async createUser (data: UserRepositoryDTO) {
@@ -38,6 +38,13 @@ class AuthRepository {
 
   public async deleteRefreshToken (tokenHash: string) {
     await prisma.refreshToken.deleteMany({ where: { tokenHash } });
+  }
+
+  public async createPasswordReset (data: PasswordResetDTO) {
+    await prisma.$transaction([
+      prisma.passwordReset.deleteMany({ where: { userId: data.userId } }),
+      prisma.passwordReset.create({ data }),
+    ]);
   }
 }
 
