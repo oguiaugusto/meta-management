@@ -12,6 +12,7 @@ import { MESSAGES } from '../../../shared/constants/messages';
 
 import * as b from 'bcrypt';
 import Token from '../helpers/Token';
+import { dayjsUtc } from '../../../shared/utils/dayjsUtc';
 vi.mock('bcrypt', async () => {
   const actual = await vi.importActual<typeof import('bcrypt')>('bcrypt');
 
@@ -37,6 +38,7 @@ const beforeCallback = () => {
     findUserByEmail: vi.fn(),
     findByUsernameOrEmail: vi.fn(),
     createRefreshToken: vi.fn(),
+    findRefreshToken: vi.fn(),
   };
 
   const authController = new AuthController(mockRepo);
@@ -167,6 +169,75 @@ describe('Auth Endpoints', () => {
 
         expect(res.status).toBe(401);
         expect(res.body).toEqual({ message: MESSAGES.wrongCredentials });
+      });
+    });
+  });
+
+  describe(`POST ${AUTH.refresh}`, () => {
+    describe('on success', () => {
+      beforeEach(() => { 
+        [mockRepo, app, server] = beforeCallback(); 
+      });
+      
+      afterEach(() => { 
+        server.close(); 
+      });
+
+      it('should return 200 and access token if refresh token exists and is not expired', async () => {
+        mockRepo.findRefreshToken.mockResolvedValue(mockRefreshToken);
+        mockRepo.createRefreshToken.mockResolvedValue(mockRefreshToken);
+
+        const res = await request(app)
+          .post(AUTH.refresh)
+          .set('Cookie', `refreshToken=${mockRefreshToken.tokenHash}`);
+
+        const accessToken = await Token.signAccessToken(mockRefreshToken.userId);
+
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual({ accessToken });
+      });
+    });
+
+    describe('on fail', () => {
+      beforeEach(() => { 
+        [mockRepo, app, server] = beforeCallback(); 
+      });
+      
+      afterEach(() => { 
+        server.close(); 
+      });
+
+      it('should return 401 and error message if refresh token is not sent', async () => {
+        const res = await request(app).post(AUTH.refresh);
+
+        expect(res.status).toBe(401);
+        expect(res.body).toEqual({ message: MESSAGES.unauthorized });
+      });
+
+      it('should return 401 and error message if refresh token is not found', async () => {
+        mockRepo.findRefreshToken.mockResolvedValue(null);
+
+        const res = await request(app)
+          .post(AUTH.refresh)
+          .set('Cookie', 'refreshToken=invalid_refresh_token');
+
+        expect(res.status).toBe(401);
+        expect(res.body).toEqual({ message: MESSAGES.unauthorized });
+      });
+
+      it('should return 401 and error message if refresh token is expired', async () => {
+        const mock: typeof mockRefreshToken = {
+          ...mockRefreshToken,
+          expiresAt: dayjsUtc.subtract(1, 'day').toDate(),
+        };
+        mockRepo.findRefreshToken.mockResolvedValue(mock);
+
+        const res = await request(app)
+          .post(AUTH.refresh)
+          .set('Cookie', 'refreshToken=expired_refresh_token');
+
+        expect(res.status).toBe(401);
+        expect(res.body).toEqual({ message: MESSAGES.unauthorized });
       });
     });
   });
