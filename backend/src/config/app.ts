@@ -57,6 +57,7 @@ class App {
       'EMAIL_USER',
       'EMAIL_PASS',
       'JWT_SECRET',
+      'RESEND_API_KEY',
     ];
 
     const invalidEnvironmentVariables = envVars.some((str) => {
