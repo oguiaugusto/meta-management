@@ -98,6 +98,8 @@ describe('Auth Endpoints', () => {
 
         expect(res.status).toBe(201);
         expect(res.body).toEqual({});
+
+        expect(mockRepo.createUser).toHaveBeenCalledOnce();
       });
     });
 
@@ -157,6 +159,7 @@ describe('Auth Endpoints', () => {
         expect(res.status).toBe(200);
         expect(res.body).toEqual({ accessToken });
 
+        expect(mockRepo.createRefreshToken).toHaveBeenCalledOnce();
         expectRefreshToken(res);
       });
     });
@@ -224,6 +227,7 @@ describe('Auth Endpoints', () => {
         expect(res.status).toBe(200);
         expect(res.body).toEqual({ accessToken });
 
+        expect(mockRepo.createRefreshToken).toHaveBeenCalledOnce();
         expectRefreshToken(res);
       });
     });
@@ -295,7 +299,7 @@ describe('Auth Endpoints', () => {
           .set('Cookie', `refreshToken=${mockRefreshToken.tokenHash}`);
 
         expect(res.status).toBe(200);
-        expect(mockRepo.deleteRefreshToken).toHaveBeenCalled();
+        expect(mockRepo.deleteRefreshToken).toHaveBeenCalledOnce();
 
         expectRefreshTokenCleared(res);
       });
@@ -304,7 +308,7 @@ describe('Auth Endpoints', () => {
         const res = await request(app).post(AUTH.logout)
 
         expect(res.status).toBe(200);
-        expect(mockRepo.deleteRefreshToken).not.toHaveBeenCalled();
+        expect(mockRepo.deleteRefreshToken).not.toHaveBeenCalledOnce();
 
         expectRefreshTokenCleared(res);
       });
@@ -332,7 +336,7 @@ describe('Auth Endpoints', () => {
         expect(res.status).toBe(200);
         expect(res.body).toEqual({ message: MESSAGES.sentPasswordReset });
 
-        expect(sendEmail).toHaveBeenCalled();
+        expect(sendEmail).toHaveBeenCalledOnce();
       });
 
       it('should return 200 and success message regardless if user exists', async () => {
