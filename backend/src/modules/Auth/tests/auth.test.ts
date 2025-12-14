@@ -13,6 +13,7 @@ import { dayjsUtc } from '../../../shared/utils/dayjsUtc';
 import Token from '../helpers/Token';
 
 import * as b from 'bcrypt';
+import * as sendPasswordResetEmail from '../../../shared/email/sendPasswordResetEmail';
 import { sendEmail } from '../../../shared/email/sendEmail';
 
 vi.mock('bcrypt', async () => {
@@ -330,13 +331,23 @@ describe('Auth Endpoints', () => {
         mockRepo.findUserByEmail.mockResolvedValue(mockUser);
         mockRepo.createPasswordReset.mockResolvedValue(mockPasswordReset);
 
+        const mockToken = 'non_random_token';
+        const spyToken = vi.spyOn(Token, 'generateToken').mockReturnValueOnce(mockToken);
+        const spyEmail = vi.spyOn(sendPasswordResetEmail, 'sendPasswordResetEmail');
+
         const data = { host: 'http://localhost:3000', email: mockUser.email };
+        const expectedLink = `${data.host}${AUTH.resetPassword}/${mockToken}`;
+
         const res = await request(app).post(AUTH.forgotPassword).send(data);
 
         expect(res.status).toBe(200);
         expect(res.body).toEqual({ message: MESSAGES.sentPasswordReset });
 
         expect(sendEmail).toHaveBeenCalledOnce();
+        expect(spyEmail).toHaveBeenCalledExactlyOnceWith(mockUser.email, expectedLink);
+
+        spyToken.mockRestore();
+        spyEmail.mockRestore();
       });
 
       it('should return 200 and success message regardless if user exists', async () => {
