@@ -1,2 +1,2 @@
-export * from './Context';
+export * from './context';
 export * from './Provider';

@@ -1,10 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { AccountFormCard } from '@/shared/components/AccountFormCard';
+import { getHandleChange } from '@/shared/utils/handlers/getHandleChange';
+import { useAuthContext } from '@/shared/contexts/AuthContext';
 
 const Login: React.FC = () => {
+  const { login } = useAuthContext();
+
+  const [credentials, setCredentials] = useState({ username: '', password: '' });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await login(credentials);
+  };
+
   const renderCardBody = () => (
     <form>
       <div className="flex flex-col gap-3">
@@ -12,6 +23,8 @@ const Login: React.FC = () => {
           <Label htmlFor="username">Username or email address</Label>
           <Input
             id="username"
+            name="username"
+            onChange={ getHandleChange(setCredentials) }
             type="text"
             required
           />
@@ -26,6 +39,8 @@ const Login: React.FC = () => {
           <Input
             id="password"
             type="password"
+            name="password"
+            onChange={ getHandleChange(setCredentials) }
             required
           />
         </div>
@@ -35,7 +50,7 @@ const Login: React.FC = () => {
 
   const renderCardFooter = () => (
     <React.Fragment>
-      <Button type="submit" variant="default" className="w-full">
+      <Button type="submit" variant="default" className="w-full" onClick={ handleSubmit }>
         Sign in
       </Button>
       <p className="text-xs font-medium">
