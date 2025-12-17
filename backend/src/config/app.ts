@@ -26,14 +26,14 @@ class App {
 
   private config(): void {
     const accessControl: express.RequestHandler = (_req, res, next) => {
-      res.header('Access-Control-Allow-Origin', '*');
+      res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL);
       res.header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS,PUT,PATCH');
       res.header('Access-Control-Allow-Headers', '*');
       next();
     };
 
     this.app.use(accessControl);
-    this.app.use(cors());
+    this.app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 
     this.app.use(cookieParser());
     this.app.use(express.json({ limit: '6mb' }));
@@ -56,6 +56,7 @@ class App {
       'DB_NAME',
       'EMAIL_USER',
       'EMAIL_PASS',
+      'FRONTEND_URL',
       'JWT_SECRET',
       'RESEND_API_KEY',
     ];
