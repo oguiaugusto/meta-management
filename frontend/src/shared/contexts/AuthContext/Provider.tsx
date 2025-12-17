@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import React, { PropsWithChildren, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { AuthContext, Credentials } from './context';
 import { AUTH } from '../../../../../shared/constants/endpoints';
 
@@ -13,6 +13,7 @@ const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
       const res = await axios.post<{ accessToken: string }>(
         VITE_API_URL + AUTH.login,
         data,
+        { withCredentials: true },
       );
 
       setAccessToken(res.data.accessToken);
@@ -23,6 +24,27 @@ const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
       }
     }
   };
+
+  const refresh = async () => {
+    try {
+      const res = await axios.post<{ accessToken: string }>(
+        VITE_API_URL + AUTH.refresh,
+        undefined,
+        { withCredentials: true },
+      );
+
+      setAccessToken(res.data.accessToken);
+    } catch (err: any) {
+      if (err instanceof AxiosError) {
+        console.log(err);
+        // will implement it later
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!accessToken) refresh();
+  }, []);
 
   const value = {
     accessToken,
