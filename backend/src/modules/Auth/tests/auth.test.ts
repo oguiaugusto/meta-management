@@ -335,8 +335,8 @@ describe('Auth Endpoints', () => {
         const spyToken = vi.spyOn(Token, 'generateToken').mockReturnValueOnce(mockToken);
         const spyEmail = vi.spyOn(sendPasswordResetEmail, 'sendPasswordResetEmail');
 
-        const data = { host: 'http://localhost:3000', email: mockUser.email };
-        const expectedLink = `${data.host}${AUTH.resetPassword}/${mockToken}`;
+        const data = { email: mockUser.email };
+        const expectedLink = `${process.env.FRONTEND_URL}${AUTH.resetPassword}/${mockToken}`;
 
         const res = await request(app).post(AUTH.forgotPassword).send(data);
 

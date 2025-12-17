@@ -62,7 +62,6 @@ class AuthController {
       }),
       forgotPassword: z.object({
         email: z.email(m.email()),
-        host: z.string(),
       }),
       resetPassword: z.object({
         token: z.string(),
@@ -201,7 +200,7 @@ class AuthController {
         expiresAt: dayjsUtc.add(30, 'minutes').toISOString(),
       };
 
-      const link = `${x.host}${AUTH.resetPassword}/${token}`;
+      const link = `${process.env.FRONTEND_URL}${AUTH.resetPassword}/${token}`;
 
       await this.repo.createPasswordReset(data);
       await sendPasswordResetEmail(x.email, link);
