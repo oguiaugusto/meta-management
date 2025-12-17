@@ -25,6 +25,23 @@ const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
+  const logout = async () => {
+    try {
+      await axios.post<{ accessToken: string }>(
+        VITE_API_URL + AUTH.logout,
+        undefined,
+        { withCredentials: true },
+      );
+
+      setAccessToken(null);
+    } catch (err: any) {
+      if (err instanceof AxiosError) {
+        console.log(err);
+        // will implement it later
+      }
+    }
+  };
+
   const refresh = async () => {
     try {
       const res = await axios.post<{ accessToken: string }>(
@@ -49,6 +66,7 @@ const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const value = {
     accessToken,
     login,
+    logout,
   };
 
   return (

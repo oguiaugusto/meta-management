@@ -12,8 +12,11 @@ import {
 import logo from '../../assets/logo.svg';
 import { useNavigate } from 'react-router';
 import { ZINC_700 } from '../constants';
+import { useAuthContext } from '../contexts/AuthContext';
 
 const Header: React.FC = () => {
+  const { logout } = useAuthContext();
+
   const navigate = useNavigate();
 
   const navButtons = [
@@ -75,7 +78,10 @@ const Header: React.FC = () => {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
-                <button className="m-0 p-0 border-none outline-none flex items-center gap-2 w-full cursor-pointer">
+                <button
+                  className="m-0 p-0 border-none outline-none flex items-center gap-2 w-full cursor-pointer"
+                  onClick={ logout }
+                >
                   <LogOut size={ 10 } strokeWidth={ 1.5 } color={ ZINC_700 } />
                   <span className="mb-[1px]">Sign out</span>
                 </button>
