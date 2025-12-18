@@ -1,10 +1,10 @@
 class RequestError {
   constructor(
     public status: number,
-    public message: string,
+    public error: string | Record<string, string>,
   ) {
     this.status = status;
-    this.message = message;
+    this.error = error;
   }
 }
 

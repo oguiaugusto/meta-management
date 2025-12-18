@@ -120,7 +120,7 @@ describe('Auth Endpoints', () => {
         const res = await request(app).post(AUTH.register).send(data);
   
         expect(res.status).toBe(409);
-        expect(res.body).toEqual({ error: MESSAGES.uniqueUsername });
+        expect(res.body).toEqual({ fields: { username: MESSAGES.uniqueUsername } });
       });
   
       it('should return 409 and an error message if email already exists', async () => {
@@ -131,7 +131,7 @@ describe('Auth Endpoints', () => {
         const res = await request(app).post(AUTH.register).send(data);
   
         expect(res.status).toBe(409);
-        expect(res.body).toEqual({ error: MESSAGES.uniqueEmail });
+        expect(res.body).toEqual({ fields: { email: MESSAGES.uniqueEmail } });
       });
     });
   });
