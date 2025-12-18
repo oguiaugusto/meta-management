@@ -2,6 +2,7 @@ import axios, { AxiosError } from 'axios';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { AuthContext, Credentials } from './context';
 import { AUTH } from '../../../../../shared/constants/endpoints';
+import { parseAxiosError } from '@/shared/utils/parseAxiosError';
 
 const { VITE_API_URL } = import.meta.env;
 
@@ -18,11 +19,10 @@ const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
       setAccessToken(res.data.accessToken);
     } catch (err: any) {
-      if (err instanceof AxiosError) {
-        console.log(err);
-        // will implement it later
-      }
+      return parseAxiosError(err);
     }
+
+    return null;
   };
 
   const logout = async () => {
