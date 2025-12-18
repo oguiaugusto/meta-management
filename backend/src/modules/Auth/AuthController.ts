@@ -4,7 +4,6 @@ import { v4 } from 'uuid';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { AUTH } from '../../../../shared/constants/endpoints';
-import { messageFormatters as m } from '../../shared/utils/messageFormatters';
 import { ConflictError } from '../../shared/errors/ConflictError';
 import { UnauthorizedError } from '../../shared/errors/UnauthorizedError';
 import { BadRequestError } from '../../shared/errors/BadRequestError';
@@ -30,20 +29,10 @@ class AuthController {
 
   private get schemas() {
     const keys = {
-      name: z
-        .string(m.required('Name'))
-        .min(2, m.min('Name', 2))
-        .max(50, m.max('Name', 50)),
-      username: z
-        .string(m.required('Username'))
-        .min(5, m.min('Username', 5))
-        .max(30, m.max('Username', 30)),
-      email: z
-        .email(m.email()),
-      password: z
-        .string(m.required('Password'))
-        .min(6, m.min('Password', 6))
-        .max(30, m.max('Password', 30)),
+      name: z.string().min(2).max(50),
+      username: z.string().min(5).max(30),
+      email: z.email(),
+      password: z.string().min(6).max(30),
     };
 
     return {
@@ -54,21 +43,15 @@ class AuthController {
         password: keys.password,
       }),
       login: z.object({
-        username: z
-          .string()
-          .min(5, m.min('Username/Email', 5))
-          .max(254, m.max('Username/Email', 254)),
+        username: z.string().min(5).max(254),
         password: keys.password,
       }),
       forgotPassword: z.object({
-        email: z.email(m.email()),
+        email: z.email(),
       }),
       resetPassword: z.object({
         token: z.string(),
-        newPassword: z
-          .string(m.required('Password'))
-          .min(6, m.min('Password', 6))
-          .max(30, m.max('Password', 30)),
+        newPassword: keys.password,
       }),
     };
   }
