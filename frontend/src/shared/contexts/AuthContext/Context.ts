@@ -6,7 +6,7 @@ export type Credentials = { username: string, password: string };
 
 type Props = {
   accessToken: string | null;
-  login: (data: Credentials) => ApiFetchReturn;
+  login: (data: Credentials) => Promise<ApiFetchReturn>;
   logout: AsyncVoidFunction;
 };
 

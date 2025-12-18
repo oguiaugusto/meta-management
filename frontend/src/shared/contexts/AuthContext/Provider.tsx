@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { AuthContext, Credentials } from './context';
 import { AUTH } from '../../../../../shared/constants/endpoints';
-import { parseApiError } from '@/shared/utils/parseApiError';
+import { parseApiError } from '@/shared/utils/api/parseApiError';
 import { ApiFetchReturn } from '@/shared/types/misc';
 
 const { VITE_API_URL } = import.meta.env;
@@ -10,7 +10,7 @@ const { VITE_API_URL } = import.meta.env;
 const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
-  const login = async (data: Credentials): ApiFetchReturn => {
+  const login = async (data: Credentials): Promise<ApiFetchReturn> => {
     try {
       const res = await axios.post<{ accessToken: string }>(
         VITE_API_URL + AUTH.login,

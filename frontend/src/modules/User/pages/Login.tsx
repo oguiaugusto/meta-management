@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { AccountFormCard } from '@/shared/components/AccountFormCard';
 import { getHandleChange } from '@/shared/utils/handlers/getHandleChange';
@@ -7,6 +6,7 @@ import { useAuthContext } from '@/shared/contexts/AuthContext';
 import { useErrorAlert } from '@/shared/hooks/useErrorAlert';
 import { FormInput } from '@/shared/components/FormInput';
 import { mountFieldErrors } from '@/shared/utils/mountFieldErrors';
+import { handleApiError } from '@/shared/utils/api/handleApiError';
 
 const Login: React.FC = () => {
   const { login } = useAuthContext();
@@ -19,24 +19,10 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setAlertMessage('');
-    const res = await login(credentials);
 
-    if (!res.ok && res.error) {
-      switch (res.error.type) {
-        case 'field':
-          setFieldErrors(res.error.fields);
-          break;
-        case 'form':
-          setAlertMessage(res.error.message);
-          break;
-        case 'unknown':
-          toast.error(res.error.message, { className: 'error-toast' });
-          break;
-      }
-      return;
-    }
+    const res = await login(credentials);
+    handleApiError(res, setFieldErrors, setAlertMessage);
   };
 
   const renderCardBody = () => (
