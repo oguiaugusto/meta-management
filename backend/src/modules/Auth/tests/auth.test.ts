@@ -120,7 +120,7 @@ describe('Auth Endpoints', () => {
         const res = await request(app).post(AUTH.register).send(data);
   
         expect(res.status).toBe(409);
-        expect(res.body).toEqual({ message: MESSAGES.uniqueUsername });
+        expect(res.body).toEqual({ error: MESSAGES.uniqueUsername });
       });
   
       it('should return 409 and an error message if email already exists', async () => {
@@ -131,7 +131,7 @@ describe('Auth Endpoints', () => {
         const res = await request(app).post(AUTH.register).send(data);
   
         expect(res.status).toBe(409);
-        expect(res.body).toEqual({ message: MESSAGES.uniqueEmail });
+        expect(res.body).toEqual({ error: MESSAGES.uniqueEmail });
       });
     });
   });
@@ -183,7 +183,7 @@ describe('Auth Endpoints', () => {
         const res = await request(app).post(AUTH.login).send(data);
 
         expect(res.status).toBe(401);
-        expect(res.body).toEqual({ message: MESSAGES.wrongCredentials });
+        expect(res.body).toEqual({ error: MESSAGES.wrongCredentials });
 
         expectRefreshTokenCleared(res);
       });
@@ -198,7 +198,7 @@ describe('Auth Endpoints', () => {
         const res = await request(app).post(AUTH.login).send(data);
 
         expect(res.status).toBe(401);
-        expect(res.body).toEqual({ message: MESSAGES.wrongCredentials });
+        expect(res.body).toEqual({ error: MESSAGES.wrongCredentials });
 
         expectRefreshTokenCleared(res);
       });
@@ -246,7 +246,7 @@ describe('Auth Endpoints', () => {
         const res = await request(app).post(AUTH.refresh);
 
         expect(res.status).toBe(401);
-        expect(res.body).toEqual({ message: MESSAGES.unauthorized });
+        expect(res.body).toEqual({ error: MESSAGES.unauthorized });
 
         expectRefreshTokenCleared(res);
       });
@@ -259,7 +259,7 @@ describe('Auth Endpoints', () => {
           .set('Cookie', 'refreshToken=invalid_refresh_token');
 
         expect(res.status).toBe(401);
-        expect(res.body).toEqual({ message: MESSAGES.unauthorized });
+        expect(res.body).toEqual({ error: MESSAGES.unauthorized });
 
         expectRefreshTokenCleared(res);
       });
@@ -276,7 +276,7 @@ describe('Auth Endpoints', () => {
           .set('Cookie', 'refreshToken=expired_refresh_token');
 
         expect(res.status).toBe(401);
-        expect(res.body).toEqual({ message: MESSAGES.unauthorized });
+        expect(res.body).toEqual({ error: MESSAGES.unauthorized });
 
         expectRefreshTokenCleared(res);
       });
@@ -406,7 +406,7 @@ describe('Auth Endpoints', () => {
         const res = await request(app).patch(AUTH.resetPassword).send(data);
 
         expect(res.status).toBe(400);
-        expect(res.body).toEqual({ message: MESSAGES.invalidPasswordReset });
+        expect(res.body).toEqual({ error: MESSAGES.invalidPasswordReset });
       });
 
       it('should return 400 and error message if token is expired', async () => {
@@ -420,7 +420,7 @@ describe('Auth Endpoints', () => {
         const res = await request(app).patch(AUTH.resetPassword).send(data);
 
         expect(res.status).toBe(400);
-        expect(res.body).toEqual({ message: MESSAGES.expiredPasswordReset });
+        expect(res.body).toEqual({ error: MESSAGES.expiredPasswordReset });
       });
     });
   });
