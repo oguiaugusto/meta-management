@@ -2,6 +2,7 @@ import { ChangeHandler, SetStateFunction } from '@/shared/types/misc';
 
 const getHandleChange = <T>(
   setState: SetStateFunction<T>,
+  setErrors: SetStateFunction<Record<string, string>>,
   formatter?: (value: string) => string,
 ) => {
   const handleChange: ChangeHandler = (e) => {
@@ -18,6 +19,8 @@ const getHandleChange = <T>(
         [name]: type === 'checkbox' ? checked : value,
       }));
     }
+
+    setErrors((p) => ({ ...p, [name]: '' }));
   };
 
   return handleChange;

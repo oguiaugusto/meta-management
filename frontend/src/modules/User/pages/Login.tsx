@@ -1,49 +1,57 @@
 import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { AccountFormCard } from '@/shared/components/AccountFormCard';
 import { getHandleChange } from '@/shared/utils/handlers/getHandleChange';
 import { useAuthContext } from '@/shared/contexts/AuthContext';
+import { useErrorAlert } from '@/shared/hooks/useErrorAlert';
+import { FormInput } from '@/shared/components/FormInput';
+import { mountFieldErrors } from '@/shared/utils/mountFieldErrors';
 
 const Login: React.FC = () => {
   const { login } = useAuthContext();
+  const [renderAlert, setAlertMessage] = useErrorAlert();
 
   const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [fieldErrors, setFieldErrors] = useState(mountFieldErrors(credentials));
+
+  const handleChange = getHandleChange(setCredentials, setFieldErrors);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(credentials);
+
+    setAlertMessage('');
+    const res = await login(credentials);
+    if (res) {
+      if (res.error) setAlertMessage(res.error);
+      if (res.fields) setFieldErrors(res.fields);
+    }
   };
 
   const renderCardBody = () => (
     <form>
+      { renderAlert() }
       <div className="flex flex-col gap-3">
-        <div className="grid gap-2">
-          <Label htmlFor="username">Username or email address</Label>
-          <Input
-            id="username"
-            name="username"
-            onChange={ getHandleChange(setCredentials) }
-            type="text"
-            required
-          />
-        </div>
-        <div className="grid gap-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
+        <FormInput
+          type="text"
+          name="username"
+          label="Username or email address"
+          errorMessage={ fieldErrors.username }
+          onChange={ handleChange }
+          required
+        />
+        <FormInput
+          type="password"
+          name="password"
+          label="Password"
+          errorMessage={ fieldErrors.password }
+          onChange={ handleChange }
+          required
+          labelLink={(
             <a href="/recover" className="text-xs mt-[3.5px] underline-offset-4 hover:underline">
               Forgot your password?
             </a>
-          </div>
-          <Input
-            id="password"
-            type="password"
-            name="password"
-            onChange={ getHandleChange(setCredentials) }
-            required
-          />
-        </div>
+          )}
+        />
       </div>
     </form>
   );
