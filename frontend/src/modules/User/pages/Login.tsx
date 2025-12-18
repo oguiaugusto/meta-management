@@ -21,9 +21,20 @@ const Login: React.FC = () => {
 
     setAlertMessage('');
     const res = await login(credentials);
-    if (res) {
-      if (res.error) setAlertMessage(res.error);
-      if (res.fields) setFieldErrors(res.fields);
+
+    if (!res.ok && res.error) {
+      switch (res.error.type) {
+        case 'field':
+          setFieldErrors(res.error.fields);
+          break;
+        case 'form':
+          setAlertMessage(res.error.message);
+          break;
+        case 'unknown':
+          // toast error
+          break;
+      }
+      return;
     }
   };
 

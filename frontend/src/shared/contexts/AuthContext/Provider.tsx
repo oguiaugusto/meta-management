@@ -2,14 +2,15 @@ import axios, { AxiosError } from 'axios';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { AuthContext, Credentials } from './context';
 import { AUTH } from '../../../../../shared/constants/endpoints';
-import { parseAxiosError } from '@/shared/utils/parseAxiosError';
+import { parseApiError } from '@/shared/utils/parseApiError';
+import { ApiFetchReturn } from '@/shared/types/misc';
 
 const { VITE_API_URL } = import.meta.env;
 
 const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
-  const login = async (data: Credentials) => {
+  const login = async (data: Credentials): ApiFetchReturn => {
     try {
       const res = await axios.post<{ accessToken: string }>(
         VITE_API_URL + AUTH.login,
@@ -18,11 +19,10 @@ const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
       );
 
       setAccessToken(res.data.accessToken);
-    } catch (err: any) {
-      return parseAxiosError(err);
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: parseApiError(error) };
     }
-
-    return null;
   };
 
   const logout = async () => {
