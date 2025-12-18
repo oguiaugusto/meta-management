@@ -10,16 +10,16 @@ type Props = {
 
 const AccountFormCard: React.FC<Props> = (p) => {
   return (
-  <Card className="w-100 max-w-xs mt-20">
-    <CardHeader className="flex flex-items items-center justify-center">
-      <CardTitle className="text-center flex flex-col items-center gap-1">
-        <img src={ logo } alt="Meta Management logo" className="w-10" />
-        <span className="text-lg">{ p.title }</span>
-      </CardTitle>
-    </CardHeader>
-    <CardContent>{ p.body }</CardContent>
-    <CardFooter className="flex flex-col gap-2 mt-2">{ p.footer }</CardFooter>
-  </Card>
+    <Card className="w-100 max-w-xs mt-28">
+      <CardHeader className="flex flex-items items-center justify-center">
+        <CardTitle className="text-center flex flex-col items-center gap-1">
+          <img src={ logo } alt="Meta Management logo" className="w-10" />
+          <span className="text-lg">{ p.title }</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>{ p.body }</CardContent>
+      <CardFooter className="flex flex-col gap-2 mt-2">{ p.footer }</CardFooter>
+    </Card>
   );
 };
 

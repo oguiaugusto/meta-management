@@ -7,6 +7,7 @@ import { Register } from './modules/User/pages/Register';
 import { Databases } from './modules/Database/pages/Databases';
 import { Database } from './modules/Database/pages/Database';
 import { AuthProvider } from './shared/contexts/AuthContext';
+import { Toaster } from './components/ui/sonner';
 
 const renderRouter = (
   path: string,
@@ -26,6 +27,7 @@ const App: React.FC = () => {
 
   return (
     <AuthProvider>
+      <Toaster position="top-center" />
       <Router>
         <Routes>
           { renderRouter('/login', <Login />) }

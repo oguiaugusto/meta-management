@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { AccountFormCard } from '@/shared/components/AccountFormCard';
 import { getHandleChange } from '@/shared/utils/handlers/getHandleChange';
@@ -31,7 +32,7 @@ const Login: React.FC = () => {
           setAlertMessage(res.error.message);
           break;
         case 'unknown':
-          // toast error
+          toast.error(res.error.message, { className: 'error-toast' });
           break;
       }
       return;

@@ -120,4 +120,9 @@
     @apply bg-background text-foreground;
     background: oklch(92.8% 0.006 264.531);
   }
+
+  .error-toast {
+    background-color: oklch(70.4% 0.191 22.216) !important;
+    color: oklch(96.7% 0.001 286.375) !important;
+  }
 }
