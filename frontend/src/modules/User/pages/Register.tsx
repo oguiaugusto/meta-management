@@ -6,7 +6,7 @@ import { AccountFormCard } from '@/shared/components/AccountFormCard';
 
 const Register: React.FC = () => {
   const renderCardBody = () => (
-    <form>
+    <React.Fragment>
       <div className="flex flex-col gap-3">
         <div className="grid gap-2">
           <Label htmlFor="username">Username</Label>
@@ -33,12 +33,12 @@ const Register: React.FC = () => {
           />
         </div>
       </div>
-    </form>
+    </React.Fragment>
   );
 
   const renderCardFooter = () => (
     <React.Fragment>
-    <Button type="submit" variant="default" className="w-full">
+      <Button type="submit" variant="default" className="w-full">
         Sign up
       </Button>
       <p className="text-xs font-medium">
@@ -50,11 +50,13 @@ const Register: React.FC = () => {
 
   return (
     <div className="w-full flex flex-col items-center">
-      <AccountFormCard
-        title="Sign up for Meta Management"
-        body={ renderCardBody() }
-        footer={ renderCardFooter() }
-      />
+      <form>
+        <AccountFormCard
+          title="Sign up for Meta Management"
+          body={ renderCardBody() }
+          footer={ renderCardFooter() }
+        />
+      </form>
     </div>
   );
 };

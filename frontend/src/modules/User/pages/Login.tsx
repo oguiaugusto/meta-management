@@ -40,7 +40,7 @@ const Login: React.FC = () => {
   };
 
   const renderCardBody = () => (
-    <form>
+    <React.Fragment>
       { renderAlert() }
       <div className="flex flex-col gap-3">
         <FormInput
@@ -65,12 +65,12 @@ const Login: React.FC = () => {
           )}
         />
       </div>
-    </form>
+    </React.Fragment>
   );
 
   const renderCardFooter = () => (
     <React.Fragment>
-      <Button type="submit" variant="default" className="w-full" onClick={ handleSubmit }>
+      <Button type="submit" variant="default" className="w-full">
         Sign in
       </Button>
       <p className="text-xs font-medium">
@@ -82,11 +82,13 @@ const Login: React.FC = () => {
 
   return (
     <div className="w-full flex flex-col items-center">
-      <AccountFormCard
-        title="Sign in to Meta Management"
-        body={ renderCardBody() }
-        footer={ renderCardFooter() }
-      />
+      <form onSubmit={ handleSubmit }>
+        <AccountFormCard
+          title="Sign in to Meta Management"
+          body={ renderCardBody() }
+          footer={ renderCardFooter() }
+        />
+      </form>
     </div>
   );
 };
