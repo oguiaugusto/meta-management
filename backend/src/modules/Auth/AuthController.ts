@@ -61,12 +61,12 @@ class AuthController {
 
     const exUsername = await this.repo.findUserByUsername(x.username);
     if (exUsername) {
-      throw new ConflictError({ username: MESSAGES.uniqueUsername });
+      throw new ConflictError({ username: MESSAGES.uniqueUsername }, 'field');
     }
 
     const exEmail = await this.repo.findUserByEmail(x.email);
     if (exEmail) {
-      throw new ConflictError({ email: MESSAGES.uniqueEmail });
+      throw new ConflictError({ email: MESSAGES.uniqueEmail }, 'field');
     }
 
     const salt = await b.genSalt(11);
@@ -92,7 +92,7 @@ class AuthController {
     const matchingPassword = await b.compare(x.password, passwordHash);
 
     if (!user || !matchingPassword) {
-      throw new UnauthorizedError(MESSAGES.wrongCredentials);
+      throw new UnauthorizedError(MESSAGES.wrongCredentials, 'form');
     }
 
     const accessToken = await Token.signAccessToken(user.id);
@@ -121,14 +121,14 @@ class AuthController {
     const oldToken: string = req.cookies?.refreshToken;
 
     if (!oldToken) {
-      throw new UnauthorizedError(MESSAGES.unauthorized);
+      throw new UnauthorizedError(MESSAGES.unauthorized, 'unknown');
     }
 
     const oldTokenHash = Token.hashToken(oldToken);
     const stored = await this.repo.findRefreshToken(oldTokenHash);
 
     if (!stored || dayjsUtc.isAfter(stored.expiresAt)) {
-      throw new UnauthorizedError(MESSAGES.unauthorized);
+      throw new UnauthorizedError(MESSAGES.unauthorized, 'unknown');
     }
 
     const accessToken = await Token.signAccessToken(stored.userId);
@@ -199,11 +199,11 @@ class AuthController {
     const passwordReset = await this.repo.findPasswordReset(tokenHash);
 
     if (!passwordReset) {
-      throw new BadRequestError(MESSAGES.invalidPasswordReset);
+      throw new BadRequestError(MESSAGES.invalidPasswordReset, 'form');
     }
 
     if (dayjsUtc.isAfter(passwordReset.expiresAt)) {
-      throw new BadRequestError(MESSAGES.expiredPasswordReset);
+      throw new BadRequestError(MESSAGES.expiredPasswordReset, 'form');
     }
 
     const salt = await b.genSalt(11);

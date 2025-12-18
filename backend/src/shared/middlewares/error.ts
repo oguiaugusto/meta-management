@@ -4,19 +4,22 @@ import { ZodError } from 'zod';
 import { UnauthorizedError } from '../errors/UnauthorizedError';
 import { zodErrorMap } from '../utils/zodErrorMap';
 import RequestError from '../errors/RequestError';
+import { ErrorType } from '../types/misc';
 
-type ErrorType = Error | RequestError | ZodError;
+type ErrType = Error | RequestError | ZodError;
 
 class ErrorMiddleware {
-  public static handle = (err: ErrorType, _req: Request, res: Response, _next: NextFunction) => {
+  public static handle = (err: ErrType, _req: Request, res: Response, _next: NextFunction) => {
     let status = StatusCodes.INTERNAL_SERVER_ERROR;
 
-    let error: string | undefined = 'Internal Server Error';
+    let type: ErrorType = 'unknown';
+    let message: string | undefined = 'Unexpected server error';
     let fields: Record<string, string> | undefined;
 
     if (err instanceof ZodError) {
+      type = 'field';
+      message = undefined;
       fields = zodErrorMap(err);
-      error = undefined;
 
       status = StatusCodes.BAD_REQUEST;
     }
@@ -24,12 +27,14 @@ class ErrorMiddleware {
     if (err instanceof RequestError) {
       status = err.status;
 
-      if (typeof err.error === 'string') {
-        error = err.error;
+      type = err.type;
+
+      if (err.type === 'field' && typeof err.message !== 'string') {
+        message = undefined;
+        fields = err.message;
+      } else if (typeof err.message === 'string') {
+        message = err.message;
         fields = undefined;
-      } else {
-        fields = err.error;
-        error = undefined;
       }
     }
 
@@ -43,7 +48,7 @@ class ErrorMiddleware {
 
     // console.log(err);
 
-    return res.status(status).json({ error, fields });
+    return res.status(status).json({ type, message, fields });
   };
 }
 

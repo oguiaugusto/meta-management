@@ -1,10 +1,13 @@
+import { ErrorType } from '../types/misc';
+
 class RequestError {
   constructor(
     public status: number,
-    public error: string | Record<string, string>,
+    public message: string | Record<string, string>,
+    public type: ErrorType,
   ) {
     this.status = status;
-    this.error = error;
+    this.message = message;
   }
 }
 

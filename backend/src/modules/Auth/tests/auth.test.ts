@@ -15,6 +15,7 @@ import Token from '../helpers/Token';
 import * as b from 'bcrypt';
 import * as sendPasswordResetEmail from '../../../shared/email/sendPasswordResetEmail';
 import { sendEmail } from '../../../shared/email/sendEmail';
+import { ErrorType } from '../../../shared/types/misc';
 
 vi.mock('bcrypt', async () => {
   const actual = await vi.importActual<typeof import('bcrypt')>('bcrypt');
@@ -28,6 +29,12 @@ vi.mock('bcrypt', async () => {
 vi.mock('../../../shared/email/sendEmail.ts', () => ({
   sendEmail: vi.fn(),
 }));
+
+const errorTypes: Record<ErrorType, string> = {
+  form: 'form',
+  validation: 'validation',
+  unknown: 'unknown',
+}
 
 let baseUserTest: UserDTO = {
   username: 'usernametest',
@@ -113,17 +120,17 @@ describe('Auth Endpoints', () => {
         server.close();
       });
   
-      it('should return 409 and an error message if username already exists', async () => {
+      it('should return 409 and an error if username already exists', async () => {
         mockRepo.findUserByUsername.mockResolvedValue(mockUser);
   
         const data = { ...baseUserTest, username: mockUser.username };
         const res = await request(app).post(AUTH.register).send(data);
   
         expect(res.status).toBe(409);
-        expect(res.body).toEqual({ fields: { username: MESSAGES.uniqueUsername } });
+        expect(res.body).toEqual({ type: errorTypes.validation, fields: { username: MESSAGES.uniqueUsername } });
       });
   
-      it('should return 409 and an error message if email already exists', async () => {
+      it('should return 409 and an error if email already exists', async () => {
         mockRepo.findUserByUsername.mockResolvedValue(null);
         mockRepo.findUserByEmail.mockResolvedValue(mockUser);
 
@@ -131,7 +138,7 @@ describe('Auth Endpoints', () => {
         const res = await request(app).post(AUTH.register).send(data);
   
         expect(res.status).toBe(409);
-        expect(res.body).toEqual({ fields: { email: MESSAGES.uniqueEmail } });
+        expect(res.body).toEqual({ type: errorTypes.validation, fields: { email: MESSAGES.uniqueEmail } });
       });
     });
   });
@@ -174,7 +181,7 @@ describe('Auth Endpoints', () => {
         server.close();
       });
 
-      it('should return 401 and error message if username/email is incorrect', async () => {
+      it('should return 401 and error if username/email is incorrect', async () => {
         mockRepo.findUserByUsernameOrEmail.mockResolvedValue(null);
 
         vi.mocked(b.compare).mockResolvedValue(true as any);
@@ -183,12 +190,12 @@ describe('Auth Endpoints', () => {
         const res = await request(app).post(AUTH.login).send(data);
 
         expect(res.status).toBe(401);
-        expect(res.body).toEqual({ error: MESSAGES.wrongCredentials });
+        expect(res.body).toEqual({ type: errorTypes.form, message: MESSAGES.wrongCredentials });
 
         expectRefreshTokenCleared(res);
       });
 
-      it('should return 401 and error message if password is incorrect', async () => {
+      it('should return 401 and error if password is incorrect', async () => {
         mockRepo.findUserByUsername.mockResolvedValue(mockUser);
         mockRepo.findUserByEmail.mockResolvedValue(null);
 
@@ -198,7 +205,7 @@ describe('Auth Endpoints', () => {
         const res = await request(app).post(AUTH.login).send(data);
 
         expect(res.status).toBe(401);
-        expect(res.body).toEqual({ error: MESSAGES.wrongCredentials });
+        expect(res.body).toEqual({ type: errorTypes.form, message: MESSAGES.wrongCredentials });
 
         expectRefreshTokenCleared(res);
       });
@@ -242,16 +249,16 @@ describe('Auth Endpoints', () => {
         server.close();
       });
 
-      it('should return 401 and error message if refresh token is not sent', async () => {
+      it('should return 401 and error if refresh token is not sent', async () => {
         const res = await request(app).post(AUTH.refresh);
 
         expect(res.status).toBe(401);
-        expect(res.body).toEqual({ error: MESSAGES.unauthorized });
+        expect(res.body).toEqual({ type: errorTypes.unknown, message: MESSAGES.unauthorized });
 
         expectRefreshTokenCleared(res);
       });
 
-      it('should return 401 and error message if refresh token is not found', async () => {
+      it('should return 401 and error if refresh token is not found', async () => {
         mockRepo.findRefreshToken.mockResolvedValue(null);
 
         const res = await request(app)
@@ -259,12 +266,12 @@ describe('Auth Endpoints', () => {
           .set('Cookie', 'refreshToken=invalid_refresh_token');
 
         expect(res.status).toBe(401);
-        expect(res.body).toEqual({ error: MESSAGES.unauthorized });
+        expect(res.body).toEqual({ type: errorTypes.unknown, message: MESSAGES.unauthorized });
 
         expectRefreshTokenCleared(res);
       });
 
-      it('should return 401 and error message if refresh token is expired', async () => {
+      it('should return 401 and error if refresh token is expired', async () => {
         const mock: typeof mockRefreshToken = {
           ...mockRefreshToken,
           expiresAt: dayjsUtc.subtract(1, 'day').toDate(),
@@ -276,7 +283,7 @@ describe('Auth Endpoints', () => {
           .set('Cookie', 'refreshToken=expired_refresh_token');
 
         expect(res.status).toBe(401);
-        expect(res.body).toEqual({ error: MESSAGES.unauthorized });
+        expect(res.body).toEqual({ type: errorTypes.unknown, message: MESSAGES.unauthorized });
 
         expectRefreshTokenCleared(res);
       });
@@ -399,17 +406,17 @@ describe('Auth Endpoints', () => {
         server.close();
       });
 
-      it('should return 400 and error message if token is invalid', async () => {
+      it('should return 400 and error if token is invalid', async () => {
         mockRepo.findPasswordReset.mockResolvedValue(null);
 
         const data = { token: 'invalid_token', newPassword: 'new_password' };
         const res = await request(app).patch(AUTH.resetPassword).send(data);
 
         expect(res.status).toBe(400);
-        expect(res.body).toEqual({ error: MESSAGES.invalidPasswordReset });
+        expect(res.body).toEqual({ type: errorTypes.form, message: MESSAGES.invalidPasswordReset });
       });
 
-      it('should return 400 and error message if token is expired', async () => {
+      it('should return 400 and error if token is expired', async () => {
         const mock: typeof mockPasswordReset = {
           ...mockPasswordReset,
           expiresAt: dayjsUtc.subtract(1, 'day').toDate(),
@@ -420,7 +427,7 @@ describe('Auth Endpoints', () => {
         const res = await request(app).patch(AUTH.resetPassword).send(data);
 
         expect(res.status).toBe(400);
-        expect(res.body).toEqual({ error: MESSAGES.expiredPasswordReset });
+        expect(res.body).toEqual({ type: errorTypes.form, message: MESSAGES.expiredPasswordReset });
       });
     });
   });
