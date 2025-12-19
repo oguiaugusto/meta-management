@@ -6,7 +6,7 @@ import { useAuthContext } from '@/shared/contexts/AuthContext';
 import { useErrorAlert } from '@/shared/hooks/useErrorAlert';
 import { FormInput } from '@/shared/components/FormInput';
 import { mountFieldErrors } from '@/shared/utils/mountFieldErrors';
-import { handleApiError } from '@/shared/utils/api/handleApiError';
+import { handleApiError } from '@/shared/api/helpers/handleApiError';
 
 const Login: React.FC = () => {
   const { login } = useAuthContext();
