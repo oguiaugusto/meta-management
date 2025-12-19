@@ -1,24 +1,24 @@
-import axios, { AxiosError } from 'axios';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { AuthContext, Credentials } from './context';
-import { AUTH } from '../../../../../shared/constants/endpoints';
-import { parseApiError } from '@/shared/utils/api/parseApiError';
+import { parseApiError } from '@/shared/api/helpers/parseApiError';
 import { ApiFetchReturn } from '@/shared/types/misc';
-
-const { VITE_API_URL } = import.meta.env;
+import { PageSpinner } from '@/shared/components/PageSpinner';
+import { loginRequest, logoutRequest, refreshRequest } from '@/shared/api/auth';
+import { multiPending } from '@/shared/api/helpers/multiPending';
 
 const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
+  const loginMutation = useMutation({ mutationFn: loginRequest })
+  const logoutMutation = useMutation({ mutationFn: logoutRequest })
+  const refreshMutation = useMutation({ mutationFn: refreshRequest })
+
   const login = async (data: Credentials): Promise<ApiFetchReturn> => {
     try {
-      const res = await axios.post<{ accessToken: string }>(
-        VITE_API_URL + AUTH.login,
-        data,
-        { withCredentials: true },
-      );
+      const res = await loginMutation.mutateAsync(data);
 
-      setAccessToken(res.data.accessToken);
+      setAccessToken(res.accessToken);
       return { ok: true };
     } catch (error) {
       return { ok: false, error: parseApiError(error) };
@@ -26,41 +26,21 @@ const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   };
 
   const logout = async () => {
-    try {
-      await axios.post<{ accessToken: string }>(
-        VITE_API_URL + AUTH.logout,
-        undefined,
-        { withCredentials: true },
-      );
-
-      setAccessToken(null);
-    } catch (err: any) {
-      if (err instanceof AxiosError) {
-        console.log(err);
-        // will implement it later
-      }
-    }
+    await logoutMutation.mutateAsync();
+    setAccessToken(null);
   };
 
-  const refresh = async () => {
+  const refreshOnLoad = async () => {
     try {
-      const res = await axios.post<{ accessToken: string }>(
-        VITE_API_URL + AUTH.refresh,
-        undefined,
-        { withCredentials: true },
-      );
-
-      setAccessToken(res.data.accessToken);
+      const res = await refreshMutation.mutateAsync();
+      setAccessToken(res.accessToken);
     } catch (err: any) {
-      if (err instanceof AxiosError) {
-        console.log(err);
-        // will implement it later
-      }
+      setAccessToken(null);
     }
   };
 
   useEffect(() => {
-    if (!accessToken) refresh();
+    if (!accessToken) refreshOnLoad();
   }, []);
 
   const value = {
@@ -68,6 +48,10 @@ const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
     login,
     logout,
   };
+
+  if (multiPending(refreshMutation, loginMutation, logoutMutation)) {
+    return <PageSpinner />;
+  }
 
   return (
     <AuthContext.Provider value={ value }>
