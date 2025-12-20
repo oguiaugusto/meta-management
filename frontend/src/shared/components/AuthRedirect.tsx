@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from 'react';
-import { useAuthContext } from '../contexts/AuthContext';
 import { Navigate } from 'react-router';
+import { useAuthContext } from "@/modules/Auth/context/AuthContext";
 
 type Props = PropsWithChildren & {
   isProtected?: boolean;

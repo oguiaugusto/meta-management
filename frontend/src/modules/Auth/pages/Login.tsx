@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { AccountFormCard } from '@/shared/components/AccountFormCard';
 import { getHandleChange } from '@/shared/utils/handlers/getHandleChange';
-import { useAuthContext } from '@/shared/contexts/AuthContext';
+import { useAuthContext } from "../context/AuthContext";
 import { useErrorAlert } from '@/shared/hooks/useErrorAlert';
 import { FormInput } from '@/shared/components/FormInput';
 import { mountFieldErrors } from '@/shared/utils/mountFieldErrors';

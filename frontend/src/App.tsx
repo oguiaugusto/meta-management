@@ -7,7 +7,7 @@ import { Login } from './modules/Auth/pages/Login';
 import { Register } from './modules/Auth/pages/Register';
 import { Databases } from './modules/Database/pages/Databases';
 import { Database } from './modules/Database/pages/Database';
-import { AuthProvider } from './shared/contexts/AuthContext';
+import { AuthProvider } from './modules/Auth/context/AuthContext';
 import { Toaster } from './components/ui/sonner';
 
 const queryClient = new QueryClient();

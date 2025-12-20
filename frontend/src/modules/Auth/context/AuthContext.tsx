@@ -1,11 +1,22 @@
-import React, { PropsWithChildren, useEffect, useState } from 'react';
+import React, { createContext, PropsWithChildren, useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { AuthContext, Credentials } from './context';
 import { parseApiError } from '@/shared/api/helpers/parseApiError';
-import { ApiFetchReturn } from '@/shared/types/misc';
+import { ApiFetchReturn, AsyncVoidFunction } from '@/shared/types/misc';
 import { PageSpinner } from '@/shared/components/PageSpinner';
-import { loginRequest, logoutRequest, refreshRequest } from '@/shared/api/auth';
+import { loginRequest, logoutRequest, refreshRequest } from '@/modules/Auth/api/requests';
 import { multiPending } from '@/shared/api/helpers/multiPending';
+import { useSafeContext } from "@/shared/hooks/useSafeContext";
+
+type Credentials = { username: string, password: string };
+
+type ContextProps = {
+  accessToken: string | null;
+  login: (data: Credentials) => Promise<ApiFetchReturn>;
+  logout: AsyncVoidFunction;
+};
+
+const AuthContext = createContext<ContextProps | null>(null);
+const useAuthContext = () => useSafeContext(AuthContext);
 
 const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -60,4 +71,4 @@ const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   );
 };
 
-export { AuthProvider };
+export { useAuthContext, AuthProvider };

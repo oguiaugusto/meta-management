@@ -12,7 +12,7 @@ import {
 import logo from '../../assets/logo.svg';
 import { useNavigate } from 'react-router';
 import { ZINC_700 } from '../constants';
-import { useAuthContext } from '../contexts/AuthContext';
+import { useAuthContext } from "@/modules/Auth/context/AuthContext";
 
 const Header: React.FC = () => {
   const { logout } = useAuthContext();
