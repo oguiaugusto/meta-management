@@ -32,7 +32,7 @@ vi.mock('../../../shared/email/sendEmail.ts', () => ({
 
 const errorTypes: Record<ErrorType, string> = {
   form: 'form',
-  validation: 'validation',
+  field: 'field',
   unknown: 'unknown',
 }
 
@@ -125,9 +125,9 @@ describe('Auth Endpoints', () => {
   
         const data = { ...baseUserTest, username: mockUser.username };
         const res = await request(app).post(AUTH.register).send(data);
-  
+
         expect(res.status).toBe(409);
-        expect(res.body).toEqual({ type: errorTypes.validation, fields: { username: MESSAGES.uniqueUsername } });
+        expect(res.body).toEqual({ type: errorTypes.form, message: MESSAGES.uniqueUsername });
       });
   
       it('should return 409 and an error if email already exists', async () => {
@@ -138,7 +138,7 @@ describe('Auth Endpoints', () => {
         const res = await request(app).post(AUTH.register).send(data);
   
         expect(res.status).toBe(409);
-        expect(res.body).toEqual({ type: errorTypes.validation, fields: { email: MESSAGES.uniqueEmail } });
+        expect(res.body).toEqual({ type: errorTypes.form, message: MESSAGES.uniqueEmail });
       });
     });
   });
