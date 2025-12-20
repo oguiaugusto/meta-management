@@ -61,12 +61,12 @@ class AuthController {
 
     const exUsername = await this.repo.findUserByUsername(x.username);
     if (exUsername) {
-      throw new ConflictError({ username: MESSAGES.uniqueUsername }, 'field');
+      throw new ConflictError(MESSAGES.uniqueUsername, 'form');
     }
 
     const exEmail = await this.repo.findUserByEmail(x.email);
     if (exEmail) {
-      throw new ConflictError({ email: MESSAGES.uniqueEmail }, 'field');
+      throw new ConflictError(MESSAGES.uniqueEmail, 'form');
     }
 
     const salt = await b.genSalt(11);

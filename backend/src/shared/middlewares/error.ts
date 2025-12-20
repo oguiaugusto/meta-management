@@ -26,7 +26,6 @@ class ErrorMiddleware {
 
     if (err instanceof RequestError) {
       status = err.status;
-
       type = err.type;
 
       if (err.type === 'field' && typeof err.message !== 'string') {
