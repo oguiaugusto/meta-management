@@ -3,8 +3,8 @@ import { Route, BrowserRouter as Router, Routes } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthRedirect } from './shared/components/AuthRedirect';
 import { Home } from './modules/Home/pages/Home';
-import { Login } from './modules/User/pages/Login';
-import { Register } from './modules/User/pages/Register';
+import { Login } from './modules/Auth/pages/Login';
+import { Register } from './modules/Auth/pages/Register';
 import { Databases } from './modules/Database/pages/Databases';
 import { Database } from './modules/Database/pages/Database';
 import { AuthProvider } from './shared/contexts/AuthContext';
