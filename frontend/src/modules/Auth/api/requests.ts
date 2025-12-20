@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { AUTH } from '../../../../../shared/constants/endpoints';
+import { AUTH } from "@/shared/constants/endpoints";
 
 const { VITE_API_URL } = import.meta.env;
 

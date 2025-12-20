@@ -5,7 +5,7 @@ import App from '../../../config/app';
 import AuthRepository from '../AuthRepository';
 import AuthController from '../AuthController';
 import Endpoints from '../../../shared/utils/Endpoint';
-import { AUTH } from '../../../../../shared/constants/endpoints';
+import { AUTH } from "../../../shared/constants/endpoints";
 import { mockPasswordReset, mockRefreshToken, mockUser } from './data';
 import { UserDTO } from '../types';
 import { MESSAGES } from '../../../shared/constants/messages';

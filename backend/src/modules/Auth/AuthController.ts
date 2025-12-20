@@ -3,7 +3,7 @@ import * as b from 'bcrypt';
 import { v4 } from 'uuid';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { AUTH } from '../../../../shared/constants/endpoints';
+import { AUTH } from '../../shared/constants/endpoints';
 import { ConflictError } from '../../shared/errors/ConflictError';
 import { UnauthorizedError } from '../../shared/errors/UnauthorizedError';
 import { BadRequestError } from '../../shared/errors/BadRequestError';
