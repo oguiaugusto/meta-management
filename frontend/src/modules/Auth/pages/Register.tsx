@@ -1,37 +1,105 @@
-import React from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from "react-router";
 import { Button } from '@/components/ui/button';
 import { AccountFormCard } from '@/shared/components/AccountFormCard';
+import { useAuthContext } from "../context/AuthContext";
+import { useErrorAlert } from "@/shared/hooks/useErrorAlert";
+import { mountFieldErrors } from "@/shared/utils/mountFieldErrors";
+import { FormInput } from "@/shared/components/FormInput";
+import { getHandleChange } from "@/shared/utils/handlers/getHandleChange";
+import { handleApiError } from "@/shared/api/helpers/handleApiError";
+import { toast } from "sonner";
 
 const Register: React.FC = () => {
+  const { register, accessToken } = useAuthContext();
+  const [renderAlert, setAlertMessage] = useErrorAlert();
+
+  const [fields, setFields] = useState({
+    name: '',
+    username: '',
+    email: '',
+    password: '',
+  });
+  const [fieldErrors, setFieldErrors] = useState(mountFieldErrors(fields));
+
+  const handleChange = getHandleChange(setFields, setFieldErrors);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAlertMessage('');
+
+    const res = await register(fields);
+    handleApiError(res, setFieldErrors, setAlertMessage);
+
+    if (res.ok) {
+      toast.promise(
+        new Promise((resolve) => setTimeout(resolve, 800)),
+        {
+          loading: (
+            <div>
+              <p className="font-bold">Account Created!</p>
+              <p>Please sign in to get started.</p>
+            </div>
+          ),
+          success: (
+            <div>
+              <p className="font-bold">Account Created!</p>
+              <p>Redirecting to Sign In.</p>
+            </div>
+          ),
+          className: 'success-toast'
+        },
+      ).unwrap().then(() => {
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 400);
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (accessToken) {
+      useNavigate()('/');
+    }
+  }, []);
+
   const renderCardBody = () => (
     <React.Fragment>
+      { renderAlert() }
       <div className="flex flex-col gap-3">
-        <div className="grid gap-2">
-          <Label htmlFor="username">Username</Label>
-          <Input
-            id="username"
-            type="text"
-            required
-          />
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type=""
-            required
-          />
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            required
-          />
-        </div>
+        <FormInput
+          type="text"
+          name="name"
+          label="Name"
+          errorMessage={ fieldErrors.name }
+          onChange={ handleChange }
+          required
+        />
+        <FormInput
+          type="text"
+          name="username"
+          label="Username"
+          errorMessage={ fieldErrors.username }
+          onChange={ handleChange }
+          required
+        />
+        <FormInput
+          type="email"
+          name="email"
+          label="Email"
+          errorMessage={ fieldErrors.email }
+          onChange={ handleChange }
+          required
+        />
+        <FormInput
+          type="password"
+          name="password"
+          label="Password"
+          autoComplete="new-password"
+          errorMessage={ fieldErrors.password }
+          onChange={ handleChange }
+          required
+        />
       </div>
     </React.Fragment>
   );
@@ -50,7 +118,7 @@ const Register: React.FC = () => {
 
   return (
     <div className="w-full flex flex-col items-center">
-      <form>
+      <form onSubmit={ handleSubmit }>
         <AccountFormCard
           title="Sign up for Meta Management"
           body={ renderCardBody() }

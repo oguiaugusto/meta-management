@@ -3,12 +3,22 @@ import { AUTH } from "@/shared/constants/endpoints";
 
 const { VITE_API_URL } = import.meta.env;
 
+async function registerRequest(data: any) {
+  const res = await axios.post(
+    VITE_API_URL + AUTH.register,
+    data,
+  );
+
+  return res.data;
+}
+
 async function loginRequest(data: any) {
   const res = await axios.post<{ accessToken: string }>(
     VITE_API_URL + AUTH.login,
     data,
     { withCredentials: true }
   );
+
   return res.data;
 }
 
@@ -26,10 +36,12 @@ async function refreshRequest() {
     undefined,
     { withCredentials: true }
   );
+
   return res.data;
 }
 
-export { 
+export {
+  registerRequest,
   loginRequest,
   logoutRequest,
   refreshRequest,

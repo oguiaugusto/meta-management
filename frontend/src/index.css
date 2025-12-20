@@ -125,4 +125,9 @@
     background-color: oklch(70.4% 0.191 22.216) !important;
     color: oklch(96.7% 0.001 286.375) !important;
   }
+
+  .success-toast {
+    background-color: oklch(52.7% 0.154 150.069) !important;
+    color: oklch(96.7% 0.001 286.375) !important;
+  }
 }

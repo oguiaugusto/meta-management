@@ -3,14 +3,16 @@ import { useMutation } from '@tanstack/react-query';
 import { parseApiError } from '@/shared/api/helpers/parseApiError';
 import { ApiFetchReturn, AsyncVoidFunction } from '@/shared/types/misc';
 import { PageSpinner } from '@/shared/components/PageSpinner';
-import { loginRequest, logoutRequest, refreshRequest } from '@/modules/Auth/api/requests';
+import { loginRequest, logoutRequest, refreshRequest, registerRequest } from '@/modules/Auth/api/requests';
 import { multiPending } from '@/shared/api/helpers/multiPending';
 import { useSafeContext } from "@/shared/hooks/useSafeContext";
+import { UserDTO } from "../types";
 
 type Credentials = { username: string, password: string };
 
 type ContextProps = {
   accessToken: string | null;
+  register: (data: UserDTO) => Promise<ApiFetchReturn>;
   login: (data: Credentials) => Promise<ApiFetchReturn>;
   logout: AsyncVoidFunction;
 };
@@ -21,9 +23,19 @@ const useAuthContext = () => useSafeContext(AuthContext);
 const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
-  const loginMutation = useMutation({ mutationFn: loginRequest })
-  const logoutMutation = useMutation({ mutationFn: logoutRequest })
-  const refreshMutation = useMutation({ mutationFn: refreshRequest })
+  const registerMutation = useMutation({ mutationFn: registerRequest });
+  const loginMutation = useMutation({ mutationFn: loginRequest });
+  const logoutMutation = useMutation({ mutationFn: logoutRequest });
+  const refreshMutation = useMutation({ mutationFn: refreshRequest });
+
+  const register = async (data: UserDTO): Promise<ApiFetchReturn> => {
+    try {
+      await registerMutation.mutateAsync(data);
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: parseApiError(error) };
+    }
+  };
 
   const login = async (data: Credentials): Promise<ApiFetchReturn> => {
     try {
@@ -56,11 +68,12 @@ const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   const value = {
     accessToken,
+    register,
     login,
     logout,
   };
 
-  if (multiPending(refreshMutation, loginMutation, logoutMutation)) {
+  if (multiPending(refreshMutation, logoutMutation)) {
     return <PageSpinner />;
   }
 
