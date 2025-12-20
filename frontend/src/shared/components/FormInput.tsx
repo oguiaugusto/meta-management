@@ -10,6 +10,7 @@ type Props = {
   required?: boolean;
   errorMessage?: string;
   labelLink?: React.ReactNode;
+  autoComplete?: React.HTMLInputAutoCompleteAttribute,
   onChange: ChangeHandler;
 };
 
@@ -33,6 +34,7 @@ const FormInput: React.FC<Props> = (p) => {
         name={ p.name }
         onChange={ p.onChange }
         required={ p.required }
+        autoComplete={ p.autoComplete }
         className={ p.errorMessage ? errorInputClass : '' }
       />
       { p.errorMessage ? renderErrorMessage() : null }
