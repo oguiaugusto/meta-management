@@ -12,6 +12,7 @@ type Credentials = { username: string, password: string };
 
 type ContextProps = {
   accessToken: string | null;
+  authLoading: boolean;
   register: (data: UserDTO) => Promise<ApiFetchReturn>;
   login: (data: Credentials) => Promise<ApiFetchReturn>;
   logout: AsyncVoidFunction;
@@ -22,6 +23,7 @@ const useAuthContext = () => useSafeContext(AuthContext);
 
 const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
   const registerMutation = useMutation({ mutationFn: registerRequest });
   const loginMutation = useMutation({ mutationFn: loginRequest });
@@ -57,17 +59,20 @@ const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
     try {
       const res = await refreshMutation.mutateAsync();
       setAccessToken(res.accessToken);
-    } catch (err: any) {
+    } catch {
       setAccessToken(null);
+    } finally {
+      setAuthLoading(false);
     }
   };
 
   useEffect(() => {
-    if (!accessToken) refreshOnLoad();
+    refreshOnLoad();
   }, []);
 
   const value = {
     accessToken,
+    authLoading,
     register,
     login,
     logout,
