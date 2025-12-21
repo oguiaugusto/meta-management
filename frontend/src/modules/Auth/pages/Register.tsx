@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { toast } from "sonner";
 import { Button } from '@/components/ui/button';
 import { AccountFormCard } from '@/shared/components/AccountFormCard';
 import { useAuthContext } from "../context/AuthContext";
@@ -8,7 +9,6 @@ import { mountFieldErrors } from "@/shared/utils/mountFieldErrors";
 import { FormInput } from "@/shared/components/FormInput";
 import { getHandleChange } from "@/shared/utils/handlers/getHandleChange";
 import { handleApiError } from "@/shared/api/helpers/handleApiError";
-import { toast } from "sonner";
 
 const Register: React.FC = () => {
   const { register, accessToken } = useAuthContext();
@@ -111,7 +111,7 @@ const Register: React.FC = () => {
       </Button>
       <p className="text-xs font-medium">
         <span>{ 'Already have an account? '}</span>
-        <a href="/login" className="underline-offset-4 hover:underline">Sign in</a>
+        <Link to="/login" className="underline-offset-4 hover:underline">Sign in</Link>
       </p>
     </React.Fragment>
   );

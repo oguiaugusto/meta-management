@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 import { BookCopy, Pencil, Plus, User } from 'lucide-react';
 import { ItemCard } from '@/shared/components/ItemCard';
 import { PageCard } from '@/shared/components/PageCard';
@@ -26,9 +26,9 @@ const Database: React.FC = () => {
   const { id } = useParams();
 
   const renderEditButton = () => (
-    <a href={ `/databases/edit/${id}` } title="Edit database" className="px-3">
+    <Link to={ `/databases/edit/${id}` } title="Edit database" className="px-3">
       <Pencil size={ 20 } color={ ZINC_700 } />
-    </a>
+    </Link>
   );
 
   return (

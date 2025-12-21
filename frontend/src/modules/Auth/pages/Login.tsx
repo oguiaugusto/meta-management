@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from "react-router";
 import { Button } from '@/components/ui/button';
 import { AccountFormCard } from '@/shared/components/AccountFormCard';
 import { getHandleChange } from '@/shared/utils/handlers/getHandleChange';
@@ -45,9 +46,9 @@ const Login: React.FC = () => {
           onChange={ handleChange }
           required
           labelLink={(
-            <a href="/recover" className="text-xs mt-[3.5px] underline-offset-4 hover:underline">
+            <Link to="/recover" className="text-xs mt-[3.5px] underline-offset-4 hover:underline">
               Forgot your password?
-            </a>
+            </Link>
           )}
         />
       </div>
@@ -61,7 +62,7 @@ const Login: React.FC = () => {
       </Button>
       <p className="text-xs font-medium">
         <span>{ 'Don\'t have an account? '}</span>
-        <a href="/register" className="underline-offset-4 hover:underline">Sign up</a>
+        <Link to="/register" className="underline-offset-4 hover:underline">Sign up</Link>
       </p>
     </React.Fragment>
   );

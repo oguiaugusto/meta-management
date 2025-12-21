@@ -30,8 +30,6 @@ const PageCard: React.FC<Props> = (p) => {
       description = null;
     }
 
-    console.log(titleClass);
-
     return (
       <CardHeader className={ headerClass }>
         <div>

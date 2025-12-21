@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import logo from '../../assets/logo.svg';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { ZINC_700 } from '../constants';
 import { useAuthContext } from "@/modules/Auth/context/AuthContext";
 
@@ -71,10 +71,10 @@ const Header: React.FC = () => {
             <DropdownMenuContent className="w-40 bg-zinc-50" align="end">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuItem>
-                <a href="/user" className="flex items-center gap-2 w-full">
+                <Link to="/user" className="flex items-center gap-2 w-full">
                   <Settings size={ 10 } strokeWidth={ 1.5 } color={ ZINC_700 } />
                   <span className="mb-[1px]">Settings</span>
-                </a>
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
