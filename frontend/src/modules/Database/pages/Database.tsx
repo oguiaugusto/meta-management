@@ -36,7 +36,8 @@ const Database: React.FC = () => {
       <PageCard
         title={ data.name }
         description={ data.description }
-        rightNode={ renderEditButton() }
+        rightElement={ renderEditButton() }
+        alignLeft
       >
         <div className="grid grid-cols-5 gap-3">
           <ItemCard

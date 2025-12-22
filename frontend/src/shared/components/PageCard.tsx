@@ -4,39 +4,44 @@ import React, { type PropsWithChildren } from 'react';
 type Props = PropsWithChildren & {
   title: string;
   description?: string;
-  rightNode?: React.ReactNode;
+  rightElement?: React.ReactNode;
+  alignLeft?: boolean;
 };
 
 const PageCard: React.FC<Props> = (p) => {
   const renderCardHeader = () => {
     let headerClass = '';
-    let titleClass = 'text-xl ';
+    let textAlignment = 'text-center';
 
-    let description: React.ReactNode | null = (
-      <CardDescription className="mb-1">{ p.description }</CardDescription>
-    );
+    let description = p.description ? (
+      <CardDescription className={ `mb-1 ${textAlignment}` }>
+        { p.description }
+      </CardDescription>
+    ) : null;
 
-    let rightNode: React.ReactNode | null = null;
+    let rightElement: React.ReactNode | null = null;
 
-    if (p.description) {
-      titleClass += 'text-left';
+    if (p.alignLeft) {
+      textAlignment = 'text-left';
+      headerClass = 'flex flex-items items-center  ';
 
-      if (p.rightNode) {
-        rightNode = p.rightNode;
-        headerClass = 'flex items-center justify-between';
+      if (p.rightElement) {
+        rightElement = p.rightElement;
+        headerClass += 'justify-between';
+      } else {
+        headerClass += 'justify-start';
       }
-    } else {
-      titleClass += 'text-center';
-      description = null;
     }
 
     return (
       <CardHeader className={ headerClass }>
         <div>
-          <CardTitle className={ titleClass }>{ p.title }</CardTitle>
+          <CardTitle className={ `text-xl mb-[-2px] ${textAlignment}` }>
+            { p.title }
+          </CardTitle>
           { description }
         </div>
-        { rightNode }
+        { rightElement }
       </CardHeader>
     );
   };
