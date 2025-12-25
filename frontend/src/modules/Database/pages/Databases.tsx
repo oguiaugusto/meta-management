@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from "react-router";
 import { Atom, Book, Car, Globe, House, Music2, Plus, ShoppingCart } from 'lucide-react';
 import { ItemCard } from '@/shared/components/ItemCard';
 import { ZINC_700 } from '@/shared/constants';
@@ -23,19 +24,26 @@ const data = [
 ];
 
 const Databases: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <PageWrapper>
       <PageCard title="Databases">
         <div className="grid grid-cols-5 gap-3">
           <ItemCard
             name="New Database"
-            link="/databases/new"
             icon={ <Plus { ...iconProps } /> }
+            action={ () => {} }
             isNewItem
           />
           {
             data.map((x, i) => (
-              <ItemCard key={ i } name={ x.name } link={ x.link } icon={ x.icon } />
+              <ItemCard
+                key={ i }
+                name={ x.name }
+                icon={ x.icon }
+                action={ () => navigate(x.link) }
+              />
             ))
           }
         </div>

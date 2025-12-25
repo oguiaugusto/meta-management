@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import { BookCopy, Pencil, Plus, User } from 'lucide-react';
 import { ItemCard } from '@/shared/components/ItemCard';
 import { PageCard } from '@/shared/components/PageCard';
@@ -24,6 +24,7 @@ const data = {
 
 const Database: React.FC = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const renderEditButton = () => (
     <Link to={ `/databases/edit/${id}` } title="Edit database" className="px-3">
@@ -42,13 +43,18 @@ const Database: React.FC = () => {
         <div className="grid grid-cols-5 gap-3">
           <ItemCard
             name="New Table"
-            link="/tables/new"
             icon={ <Plus { ...iconProps } /> }
+            action={ () => {} }
             isNewItem
           />
           {
             data.tables.map((x, i) => (
-              <ItemCard key={ i } name={ x.name } link={ x.link } icon={ x.icon } />
+              <ItemCard
+                key={ i }
+                name={ x.name }
+                icon={ x.icon }
+                action={ () => navigate(x.link) }
+              />
             ))
           }
         </div>
