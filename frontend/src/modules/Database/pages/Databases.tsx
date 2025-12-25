@@ -5,6 +5,7 @@ import { ItemCard } from '@/shared/components/ItemCard';
 import { ZINC_700 } from '@/shared/constants';
 import { PageCard } from '@/shared/components/PageCard';
 import { PageWrapper } from '@/shared/components/PageWrapper';
+import { useDatabaseForm } from "../hooks/useDatabaseForm";
 
 const iconProps = {
   size: 50,
@@ -26,14 +27,17 @@ const data = [
 const Databases: React.FC = () => {
   const navigate = useNavigate();
 
+  const dbForm = useDatabaseForm();
+
   return (
     <PageWrapper>
+      { dbForm.render() }
       <PageCard title="Databases">
         <div className="grid grid-cols-5 gap-3">
           <ItemCard
             name="New Database"
             icon={ <Plus { ...iconProps } /> }
-            action={ () => {} }
+            action={ dbForm.open }
             isNewItem
           />
           {
