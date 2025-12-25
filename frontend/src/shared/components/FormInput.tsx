@@ -2,9 +2,7 @@ import React, { HTMLInputTypeAttribute } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ChangeHandler } from '../types/misc';
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { CircleQuestionMark } from "lucide-react";
-import { ZINC_700 } from "../constants";
+import { FieldTooltip } from "./FieldTooltip";
 
 type Props = {
   type: HTMLInputTypeAttribute;
@@ -26,23 +24,12 @@ const FormInput: React.FC<Props> = (p) => {
     </p>
   );
 
-  const renderTooltip = (text: string) => (
-    <Tooltip>
-      <TooltipTrigger className="bg-zinc-100">
-        <CircleQuestionMark size={ 12 } color={ ZINC_700 } />
-      </TooltipTrigger>
-      <TooltipContent className="max-w-3xs" align="start" alignOffset={ -16 }>
-        { text }
-      </TooltipContent>
-    </Tooltip>
-  );
-
   return (
     <div className="grid gap-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
           <Label htmlFor={ p.name }>{ p.label }</Label>
-          { p.tooltipText ? renderTooltip(p.tooltipText) : null }
+          { p.tooltipText ? <FieldTooltip text={ p.tooltipText } /> : null }
         </div>
         { p.labelLink }
       </div>
