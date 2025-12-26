@@ -4,6 +4,7 @@ import { FormInput } from "@/shared/components/FormInput";
 import { mountFieldErrors } from "@/shared/utils/mountFieldErrors";
 import { getHandleChange } from "@/shared/utils/handlers/getHandleChange";
 import { Button } from "@/components/ui/button";
+import { IconSelector } from "@/shared/components/IconSelector";
 
 const useDatabaseForm = () => {
   const [state, setState] = useState(false);
@@ -15,8 +16,8 @@ const useDatabaseForm = () => {
     name: '',
     label: '',
     description: '',
+    icon: '',
   });
-
   const [fieldErrors, setFieldErrors] = useState(mountFieldErrors(fields));
 
   const handleChange = getHandleChange(setFields, setFieldErrors);
@@ -55,6 +56,11 @@ const useDatabaseForm = () => {
               errorMessage={ fieldErrors.description }
               onChange={ handleChange }
               required
+            />
+            <IconSelector
+              name="icon"
+              label="Display Icon"
+              setValue={ (x) => setFields((p) => ({ ...p, icon: x })) }
             />
           </div>
           <DialogFooter>
